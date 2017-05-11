@@ -238,6 +238,11 @@ void CVideo::init_window()
 	} else if(preferences::maximized()) {
 		window_flags |= SDL_WINDOW_MAXIMIZED;
 	}
+	
+#ifdef __IPHONEOS__
+	// Hide iOS status bar
+	window_flags |= SDL_WINDOW_BORDERLESS;
+#endif
 
 	// Initialize window
 	window.reset(new sdl::window("", x, y, w, h, window_flags, SDL_RENDERER_SOFTWARE));
