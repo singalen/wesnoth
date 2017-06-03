@@ -46,6 +46,11 @@ namespace gui{
 				preferences::set_message_private(check_->checked());
 			}
 		}
+
+		if(SDL_HasScreenKeyboardSupport()) {
+			SDL_StopTextInput();
+		}
+
 		box_.reset(nullptr);
 		check_.reset(nullptr);
 		font::remove_floating_label(label_);
@@ -96,6 +101,13 @@ namespace gui{
 			};
 
 			box_->set_location(rect);
+
+			if(SDL_HasScreenKeyboardSupport()) {
+				SDL_StartTextInput();
+				SDL_Rect r = rect;
+				SDL_SetTextInputRect(&r);
+			}
+
 		}
 
 		if(check_ != nullptr) {

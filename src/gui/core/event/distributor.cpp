@@ -650,12 +650,15 @@ void distributor::keyboard_capture(widget* widget)
 
 	keyboard_focus_ = widget;
 
+#ifndef __IPHONEOS__
+	// HACK: see also: text_box::signal_handler_left_button_down()
 	if(keyboard_focus_) {
 		DBG_GUI_E << LOG_HEADER << "Firing: " << event::RECEIVE_KEYBOARD_FOCUS
 				  << ".\n";
 
 		owner_.fire(event::RECEIVE_KEYBOARD_FOCUS, *keyboard_focus_, nullptr);
 	}
+#endif
 }
 
 void distributor::keyboard_add_to_chain(widget* widget)

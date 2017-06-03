@@ -367,6 +367,13 @@ void text_box::signal_handler_left_button_down(const event::ui_event event,
 	 * system...
 	 */
 	get_window()->keyboard_capture(this);
+#ifdef __IPHONEOS__
+	// HACK: ifdef-ed out in distributor::keyboard_capture() and only added here, as now we only pop up the keyboard when
+	// the text input gets focus by tapping.
+	// Other ways, like default focus in the dialogs, would pop up unwanted OS-keyboard when it's not needed.
+	
+    this->signal_handler_receive_keyboard_focus(event::RECEIVE_KEYBOARD_FOCUS);
+#endif
 	get_window()->mouse_capture();
 
 	handle_mouse_selection(get_mouse_position(), true);
