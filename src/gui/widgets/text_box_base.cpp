@@ -183,7 +183,12 @@ void text_box_base::interrupt_composition()
 	ime_composing_ = false;
 	// We need to inform the IME that text input is no longer in progress.
 	SDL_StopTextInput();
+#ifndef __IPHONEOS__
+	// (sinda) I wonder if SDL_StartTextInput() is really needed after SDL_StopTextInput().
+	// SDL_StopTextInput() should be sufficient, I believe.
+	// On iOS, this leads to keyboard popping up when closing every screen that had an active text input.
 	SDL_StartTextInput();
+#endif
 }
 
 void text_box_base::copy_selection(const bool mouse)
@@ -645,6 +650,12 @@ void text_box_base::signal_handler_sdl_key_down(const event::ui_event event,
 void text_box_base::signal_handler_receive_keyboard_focus(const event::ui_event event)
 {
 	DBG_GUI_E << LOG_HEADER << ' ' << event << ".\n";
+	
+	if(SDL_HasScreenKeyboardSupport() == SDL_TRUE) {
+		SDL_StartTextInput();
+		SDL_Rect r = get_rectangle();
+		SDL_SetTextInputRect(&r);
+	}
 
 	set_state(FOCUSED);
 }
@@ -652,6 +663,10 @@ void text_box_base::signal_handler_receive_keyboard_focus(const event::ui_event 
 void text_box_base::signal_handler_lose_keyboard_focus(const event::ui_event event)
 {
 	DBG_GUI_E << LOG_HEADER << ' ' << event << ".\n";
+
+	if(SDL_HasScreenKeyboardSupport() == SDL_TRUE) {
+		SDL_StopTextInput();
+	}
 
 	set_state(ENABLED);
 }
