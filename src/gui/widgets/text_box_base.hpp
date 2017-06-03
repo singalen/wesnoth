@@ -515,8 +515,10 @@ private:
 									   int32_t start,
 									   int32_t len);
 
-	void signal_handler_receive_keyboard_focus(const event::ui_event event);
 	void signal_handler_lose_keyboard_focus(const event::ui_event event);
+
+protected:
+	void signal_handler_receive_keyboard_focus(const event::ui_event event);
 };
 
 } // namespace gui2
