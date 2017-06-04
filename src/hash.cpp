@@ -21,7 +21,6 @@
 #include <sstream>
 #include <string.h>
 #include <assert.h>
-#include <SDL_platform.h>
 
 #ifndef __IPHONEOS__
 
