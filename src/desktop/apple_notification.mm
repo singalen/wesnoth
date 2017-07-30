@@ -159,7 +159,7 @@ void send_growl_notification(const std::string& owner, const std::string& messag
 		NSString *description = [NSString stringWithCString:message.c_str() encoding:NSUTF8StringEncoding];
 
 		UILocalNotification *notification = [[UILocalNotification alloc]init];
-		notification.repeatInterval = NSDayCalendarUnit;
+		notification.repeatInterval = NSCalendarUnitDay;
 		// 8.2+
 		[notification setAlertTitle: title];
 		[notification setAlertBody: description];
