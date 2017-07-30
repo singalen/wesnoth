@@ -85,6 +85,7 @@ std::string format_version(const SDL_version& v)
 						<< unsigned(v.patch);
 }
 
+#ifndef __IPHONEOS__
 std::string format_openssl_patch_level(uint8_t p)
 {
 	return p <= 26
@@ -170,6 +171,7 @@ std::string format_openssl_version(long v)
 	return fmt.str();
 
 }
+#endif
 
 version_table_manager::version_table_manager()
 	: compiled(LIB_COUNT, "")
