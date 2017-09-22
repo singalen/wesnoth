@@ -156,6 +156,13 @@ void show(const std::string& window_id,
 		  const point& mouse,
 		  const SDL_Rect& source_rect)
 {
+#ifdef __IPHONEOS__
+	// Tooltips don't let clicks go to the windows below, as tooltip is a modeless dialog.
+	// On PC, it's mitigated by mouse moves that dismiss the tooltip; nothing happens
+	// if we lose one mouse move.
+	// https://github.com/singalen/wesnoth/issues/2
+	return;
+#endif
 	/*
 	 * For now allow invalid tip names, might turn them to invalid wml messages
 	 * later on.
