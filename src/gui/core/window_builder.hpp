@@ -63,6 +63,7 @@ public:
 	/** Parameters for the widget. */
 	std::string id;
 	std::string linked_group;
+	std::string visibility;
 
 	int debug_border_mode;
 	color_t debug_border_color;
