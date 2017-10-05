@@ -62,7 +62,7 @@ widget::widget(const builder_widget& builder)
 #endif
 	, linked_group_(builder.linked_group)
 	, is_dirty_(true)
-	, visible_(visibility::visible)
+	, visible_(widget::parse_visibility(builder.visibility))
 	, redraw_action_(redraw_action::full)
 	, clipping_rectangle_()
 	, debug_border_mode_(builder.debug_border_mode)
@@ -88,6 +88,17 @@ widget::~widget()
 			window->remove_linked_widget(linked_group_, this);
 		}
 	}
+}
+
+widget::visibility widget::parse_visibility(const std::string& str)
+{
+	if(str == "hidden") {
+		return widget::visibility::hidden;
+	} else if(str == "invisible") {
+		return widget::visibility::invisible;
+	}
+
+	return widget::visibility::visible;
 }
 
 /***** ***** ***** ***** ID functions. ***** ***** ***** *****/
