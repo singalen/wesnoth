@@ -94,6 +94,8 @@ public:
 		invisible
 	};
 
+	static visibility parse_visibility(const std::string& str);
+
 	/**
 	 * Visibility set by the engine.
 	 *
