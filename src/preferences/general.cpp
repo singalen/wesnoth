@@ -440,7 +440,12 @@ void save_turbo_speed(const double speed)
 int font_scaling()
 {
 	// Clip at 80 because if it's too low it'll cause crashes
-	return std::max<int>(std::min<int>(prefs["font_scale"].to_int(100), max_font_scaling), min_font_scaling);
+#ifndef __IPHONEOS__
+	int default_scaling = 100;
+#else
+	int default_scaling = 125;
+#endif
+	return std::max<int>(std::min<int>(prefs["font_scale"].to_int(default_scaling), max_font_scaling), min_font_scaling);
 }
 
 void set_font_scaling(int scale)
@@ -707,7 +712,7 @@ bool set_music(bool ison) {
 
 bool stop_music_in_background()
 {
-	return get("stop_music_in_background", false);
+	return get("stop_music_in_background", true);
 }
 
 void set_stop_music_in_background(bool ison)
