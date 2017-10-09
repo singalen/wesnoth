@@ -706,7 +706,7 @@ bool set_music(bool ison) {
 
 bool stop_music_in_background()
 {
-	return get("stop_music_in_background", false);
+	return get("stop_music_in_background", true);
 }
 
 void set_stop_music_in_background(bool ison)
