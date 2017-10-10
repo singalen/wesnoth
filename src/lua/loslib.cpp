@@ -21,6 +21,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#endif
 
 /*
 ** {==================================================================
@@ -140,7 +143,12 @@ static time_t l_checktime (lua_State *L, int arg) {
 
 static int os_execute (lua_State *L) {
   const char *cmd = luaL_optstring(L, 1, NULL);
+#if !(TARGET_OS_IPHONE)
   int stat = system(cmd);
+#else
+  // no system() and no wesnothd on iOS.
+  int stat = 127;
+#endif
   if (cmd != NULL)
     return luaL_execresult(L, stat);
   else {
