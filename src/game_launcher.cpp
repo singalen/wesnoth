@@ -766,7 +766,8 @@ bool game_launcher::goto_editor()
 
 void game_launcher::start_wesnothd()
 {
-	const std::string wesnothd_program =
+#ifndef __IPHONEOS__
+    const std::string wesnothd_program =
 		preferences::get_mp_server_program_name().empty() ?
 		filesystem::get_program_invocation("wesnothd") : preferences::get_mp_server_program_name();
 
@@ -794,6 +795,7 @@ void game_launcher::start_wesnothd()
 		return;
 	}
 	preferences::set_mp_server_program_name("");
+#endif
 
 	// Couldn't start server so throw error
 	WRN_GENERAL << "Failed to run server start script" << std::endl;
