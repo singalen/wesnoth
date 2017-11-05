@@ -188,4 +188,5 @@ protected:
 	bool scroll_right_;
 
 	joystick_manager joystick_manager_;
+	bool last_mouse_is_touch_;
 };
