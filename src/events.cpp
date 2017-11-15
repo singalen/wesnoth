@@ -500,6 +500,10 @@ void pump()
 		switch (event.type) {
 			// TODO: Implement SDL_MULTIGESTURE. Some day.
 			case SDL_MOUSEMOTION:
+				if(event.motion.state == 0) {
+					return;
+				}
+
 				if (event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
 				{
 					SDL_Rect r = screen_area();
@@ -542,7 +546,7 @@ void pump()
 					touch_event.tfinger.y = (float) event.button.y / r.h;
 					touch_event.tfinger.pressure = 1;
 					::SDL_PushEvent(&touch_event);
-					
+
 				}
 				break;
 			default:

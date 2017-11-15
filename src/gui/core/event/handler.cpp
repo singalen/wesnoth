@@ -384,8 +384,12 @@ void sdl_event_handler::handle_event(const SDL_Event& event)
 	switch(event.type) {
 		case SDL_MOUSEMOTION:
 //			if (event.motion.which != SDL_TOUCH_MOUSEID)
+#ifdef MOUSE_TOUCH_EMULATION
+			// There's no finger motions when it's not down.
+			if (event.motion.state != 0)
+#endif
 			{
-				mouse(SDL_MOUSE_MOTION, {event.motion.x, event. motion.y});
+				mouse(SDL_MOUSE_MOTION, {event.motion.x, event.motion.y});
 			}
 			break;
 
