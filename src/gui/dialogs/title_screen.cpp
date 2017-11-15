@@ -154,7 +154,12 @@ static void register_button(window& win, const std::string& id, hotkey::HOTKEY_C
 		win.register_hotkey(hk, std::bind(callback));
 	}
 
-	connect_signal_mouse_left_click(find_widget<button>(&win, id, false), std::bind(callback));
+	button* the_button = find_widget<button>(&win, id, false, false);
+	if (the_button == nullptr) {
+		return;
+	}
+
+	connect_signal_mouse_left_click(*the_button, std::bind(callback));
 }
 
 static void launch_lua_console()
@@ -232,8 +237,14 @@ void title_screen::pre_show(window& win)
 
 	win.get_canvas(0).set_variable("background_image", wfl::variant(game_config::images::game_title_background));
 
-	find_widget<image>(&win, "logo-bg", false).set_image(game_config::images::game_logo_background);
-	find_widget<image>(&win, "logo", false).set_image(game_config::images::game_logo);
+	image* logo_bg = find_widget<image>(&win, "logo-bg", false, false);
+	if(logo_bg != nullptr) {
+		logo_bg->set_image(game_config::images::game_logo_background);
+	}
+	image* logo = find_widget<image>(&win, "logo", false, false);
+	if(logo != nullptr) {
+		logo->set_image(game_config::images::game_logo);
+	}
 
 	//
 	// Version string
@@ -249,35 +260,35 @@ void title_screen::pre_show(window& win)
 	//
 	// Tip-of-the-day browser
 	//
-	multi_page& tip_pages = find_widget<multi_page>(&win, "tips", false);
+	multi_page* tip_pages = find_widget<multi_page>(&win, "tips", false, false);
 
-	std::vector<game_tip> tips = tip_of_the_day::shuffle(settings::tips);
-	if(tips.empty()) {
-		WRN_CF << "There are no tips of day available." << std::endl;
-	}
+	if(tip_pages != nullptr) {
+		std::vector<game_tip> tips = tip_of_the_day::shuffle(settings::tips);
+		if(tips.empty()) {
+			WRN_CF << "There are no tips of day available." << std::endl;
+		}
 
-	for(const auto& tip : tips)	{
-		string_map widget;
-		std::map<std::string, string_map> page;
+		for(const auto& tip : tips) {
+			string_map widget;
+			std::map<std::string, string_map> page;
 
-		widget["use_markup"] = "true";
+			widget["use_markup"] = "true";
 
-		widget["label"] = tip.text();
-		page.emplace("tip", widget);
+			widget["label"] = tip.text();
+			page.emplace("tip", widget);
 
-		widget["label"] = tip.source();
-		page.emplace("source", widget);
+			widget["label"] = tip.source();
+			page.emplace("source", widget);
 
-		tip_pages.add_page(page);
-	}
+			tip_pages->add_page(page);
+		}
 
-	update_tip(win, true);
+		update_tip(win, true);
 
 	register_button(win, "next_tip", hotkey::TITLE_SCREEN__NEXT_TIP,
 		std::bind(&title_screen::update_tip, this, std::ref(win), true));
-
 	register_button(win, "previous_tip", hotkey::TITLE_SCREEN__PREVIOUS_TIP,
-		std::bind(&title_screen::update_tip, this, std::ref(win), false));
+		std::bind(&title_screen::update_tip, this, std::ref(win), false));}
 
 	//
 	// Help
