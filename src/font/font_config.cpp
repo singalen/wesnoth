@@ -198,7 +198,7 @@ bool load_font_config()
 	return true;
 }
 
-const t_string& get_font_families(family_class fclass)
+const std::string& get_font_families(family_class fclass)
 {
 	switch(fclass) {
 	case FONT_MONOSPACE:
