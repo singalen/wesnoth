@@ -20,6 +20,7 @@
 #include <SDL_timer.h>
 
 #include <map>
+#include <mutex>
 
 namespace gui2
 {
@@ -46,6 +47,9 @@ static std::map<size_t, timer>& get_timers()
 }
 /** The id of the event being executed, 0 if none. */
 static size_t executing_id = 0;
+
+// TODO: Read http://www.boost.org/doc/libs/1_55_0/doc/html/lockfree.html
+std::mutex timers_mutex;
 
 /** Did somebody try to remove the timer during its execution? */
 static bool executing_id_removed = false;
@@ -88,10 +92,16 @@ static uint32_t timer_callback(uint32_t, void* id)
 {
 	DBG_GUI_E << "Pushing timer event in queue.\n";
 
-	std::map<size_t, timer>::iterator itor
-			= get_timers().find(reinterpret_cast<size_t>(id));
-	if(itor == get_timers().end()) {
-		return 0;
+	Uint32 result;
+	{
+		std::lock_guard<std::mutex> lock(timers_mutex);
+
+		std::map<size_t, timer>::iterator itor
+				= get_timers().find(reinterpret_cast<size_t>(id));
+		if(itor == get_timers().end()) {
+			return 0;
+		}
+		result = itor->second.interval;
 	}
 
 	SDL_Event event;
@@ -103,7 +113,7 @@ static uint32_t timer_callback(uint32_t, void* id)
 
 	SDL_PushEvent(&event);
 
-	return itor->second.interval;
+	return result;
 }
 
 } // extern "C"
@@ -116,9 +126,18 @@ size_t add_timer(const uint32_t interval,
 
 	DBG_GUI_E << "Adding timer.\n";
 
-	do {
-		++next_timer_id;
-	} while(next_timer_id == 0 || get_timers().find(next_timer_id) != get_timers().end());
+	{
+		std::lock_guard<std::mutex> lock(timers_mutex);
+
+		do {
+			++next_timer_id;
+		} while(next_timer_id == 0 || get_timers().find(next_timer_id) != get_timers().end());
+
+		// SDL_AddTimer takes some time nad has mutexes of its own. Let's take a mild risk of a wrong timer firing
+		// to reduce time spent in lock.
+		// Maybe it makes sense to keep next_timer_id as well, as I've added the lock?..
+		// What makes most sense to me is to use sdl_id.
+	}
 
 	timer timer;
 	timer.sdl_id = SDL_AddTimer(
@@ -134,7 +153,11 @@ size_t add_timer(const uint32_t interval,
 
 	timer.callback = callback;
 
-	get_timers().emplace(next_timer_id, timer);
+	{
+		std::lock_guard<std::mutex> lock(timers_mutex);
+
+		get_timers().emplace(next_timer_id, timer);
+	}
 
 	DBG_GUI_E << "Added timer " << next_timer_id << ".\n";
 	return next_timer_id;
@@ -143,6 +166,8 @@ size_t add_timer(const uint32_t interval,
 bool remove_timer(const size_t id)
 {
 	DBG_GUI_E << "Removing timer " << id << ".\n";
+
+	std::lock_guard<std::mutex> lock(timers_mutex);
 
 	std::map<size_t, timer>::iterator itor = get_timers().find(id);
 	if(itor == get_timers().end()) {
@@ -175,20 +200,25 @@ bool execute_timer(const size_t id)
 {
 	DBG_GUI_E << "Executing timer " << id << ".\n";
 
-	std::map<size_t, timer>::iterator itor = get_timers().find(id);
-	if(itor == get_timers().end()) {
-		LOG_GUI_E << "Can't execute timer since it no longer exists.\n";
-		return false;
-	}
-
+	std::function<void(size_t)> callback = nullptr;
 	{
-		executor executor(id);
-		itor->second.callback(id);
+		std::lock_guard<std::mutex> lock(timers_mutex);
+
+		std::map<size_t, timer>::iterator itor = get_timers().find(id);
+		if(itor == get_timers().end()) {
+			LOG_GUI_E << "Can't execute timer since it no longer exists.\n";
+			return false;
+		}
+
+		callback = itor->second.callback;
+
+		if(itor->second.interval == 0) {
+			get_timers().erase(itor);
+		}
 	}
 
-	if(!executing_id_removed && itor->second.interval == 0) {
-		get_timers().erase(itor);
-	}
+	callback(id);
+
 	return true;
 }
 
