@@ -97,8 +97,8 @@ static bool add_font_to_fontlist(const config &fonts_config,
 
 // Current font family for sanserif and monospace fonts in the game
 
-t_string family_order_sans;
-t_string family_order_mono;
+std::string family_order_sans;
+std::string family_order_mono;
 
 /***
  * Public interface
@@ -139,8 +139,8 @@ bool load_font_config()
 		}
 	}
 
-	family_order_sans = fonts_config["family_order"];
-	family_order_mono = fonts_config["family_order_monospace"];
+	family_order_sans = (std::string) fonts_config["family_order"];
+	family_order_mono = (std::string) fonts_config["family_order_monospace"];
 
 	if(family_order_mono.empty()) {
 		ERR_FT << "No monospace font family order defined, falling back to sans serif order\n";
@@ -165,7 +165,7 @@ bool load_font_config()
 	return true;
 }
 
-const t_string& get_font_families(family_class fclass)
+const std::string& get_font_families(family_class fclass)
 {
 	switch(fclass) {
 	case FONT_MONOSPACE:
