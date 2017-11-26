@@ -358,6 +358,7 @@ bool play_controller::hotkey_handler::can_execute_command(const hotkey::hotkey_c
 		return play_controller_.can_undo();
 
 	case hotkey::HOTKEY_UNIT_DESCRIPTION:
+	case hotkey::HOTKEY_END_UNIT_TURN:
 		return menu_handler_.current_unit().valid();
 
 	case hotkey::HOTKEY_TERRAIN_DESCRIPTION:
