@@ -420,8 +420,19 @@ void game_display::draw_movement_info(const map_location& loc)
 
 			// simple mark (no turn point) use smaller font
 			int def_font = w->second.turns > 0 ? 18 : 16;
-			draw_text_in_hex(loc, LAYER_MOVE_INFO, def_text.str(), def_font, color);
 
+#ifdef __IPHONEOS__
+			// Draw defense rating one hex ABOVE, in order not ot be obscured by finger.
+			// TODO: Add a flag variable - which mouse was used to highlight a hex. Only do this if it's a touch "mouse"
+			if(loc == mouseoverHex_) {
+				const map_location defense_loc = loc.get_direction(map_location::NORTH, 1);
+				draw_text_in_hex(defense_loc, LAYER_MOVE_INFO, def_text.str(), def_font+4, color);
+			} else {
+				draw_text_in_hex(loc, LAYER_MOVE_INFO, def_text.str(), def_font, color);
+			}
+#else
+			draw_text_in_hex(loc, LAYER_MOVE_INFO, def_text.str(), def_font, color);
+#endif
 			int xpos = get_location_x(loc);
 			int ypos = get_location_y(loc);
 			if (w->second.invisible) {
@@ -440,7 +451,8 @@ void game_display::draw_movement_info(const map_location& loc)
 			}
 
 			//we display turn info only if different from a simple last "1"
-			if (w->second.turns > 1 || (w->second.turns == 1 && loc != route_.steps.back())) {
+			bool intermediate_turn_end = w->second.turns > 1 || (w->second.turns == 1 && loc != route_.steps.back());
+			if (intermediate_turn_end) {
 				std::stringstream turns_text;
 				turns_text << w->second.turns;
 				draw_text_in_hex(loc, LAYER_MOVE_INFO, turns_text.str(), 17, font::NORMAL_COLOR, 0.5,0.8);
@@ -582,6 +594,14 @@ void game_display::invalidate_route()
 	    i != route_.steps.end(); ++i) {
 		invalidate(*i);
 	}
+
+#ifdef __IPHONEOS__
+	// Draw defense rating one hex ABOVE, in order not ot be obscured by finger.
+	if(!route_.steps.empty()) {
+		const map_location defense_under_finger = route_.steps.back().get_direction(map_location::NORTH, 1);
+		invalidate(defense_under_finger);
+	}
+#endif
 }
 
 void game_display::set_route(const pathfind::marked_route *route)
