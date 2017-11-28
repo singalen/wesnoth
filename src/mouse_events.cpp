@@ -1052,7 +1052,19 @@ void mouse_handler::select_hex(const map_location& hex, const bool browse, const
 		// The highlight now comes from selection
 		// and not from the mouseover on an enemy
 		unselected_paths_ = false;
-		gui().set_route(nullptr);
+//#ifdef __IPHONEOS__
+//		gui().set_route(nullptr);
+//#else
+		if(is_my) {
+			const map_location go_to = unit->get_goto();
+			game_board & board = pc_.gamestate().board_;
+			if(board.map().on_board(go_to)) {
+				pathfind::marked_route route;
+				route = get_route(&(*unit), go_to, current_team());
+				gui().set_route(&route);
+			}
+		}
+//#endif
 
 		// Selection have impact only if we are not observing and it's our unit
 		if((!commands_disabled || pc_.get_whiteboard()->is_active()) && is_my) {
