@@ -21,10 +21,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-#if defined(__APPLE__) && defined(__MACH__) && defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
-#define __IPHONEOS__ (__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__*1000)
+#ifdef __APPLE__
+#include "TargetConditionals.h"
 #endif
-
 
 /*
 ** {==================================================================
@@ -144,7 +143,7 @@ static time_t l_checktime (lua_State *L, int arg) {
 
 static int os_execute (lua_State *L) {
   const char *cmd = luaL_optstring(L, 1, NULL);
-#ifndef __IPHONEOS__
+#if !(TARGET_OS_IPHONE)
   int stat = system(cmd);
 #else
   // no system() and no wesnothd on iOS.
