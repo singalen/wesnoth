@@ -443,7 +443,7 @@ int font_scaling()
 #ifndef __IPHONEOS__
 	int default_scaling = 100;
 #else
-	int default_scaling = 125;
+	int default_scaling = 100;
 #endif
 	return std::max<int>(std::min<int>(prefs["font_scale"].to_int(default_scaling), max_font_scaling), min_font_scaling);
 }
