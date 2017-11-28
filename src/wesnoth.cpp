@@ -122,6 +122,10 @@
 #include "gui/widgets/debug.hpp"
 #endif
 
+#ifdef __IPHONEOS__
+#import "Appirater.h"
+#endif
+
 class end_level_exception;
 namespace game
 {
@@ -734,6 +738,10 @@ static int do_gameloop(const std::vector<std::string>& args)
 	plugins_context plugins("titlescreen", callbacks, accessors);
 
 	plugins.set_callback("exit", [](const config& cfg) { safe_exit(cfg["code"].to_int(0)); }, false);
+
+#ifdef __IPHONEOS__
+	[Appirater appLaunched];
+#endif
 
 	for(;;) {
 		// reset the TC, since a game can modify it, and it may be used
