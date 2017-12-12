@@ -139,8 +139,8 @@ bool load_font_config()
 		}
 	}
 
-	family_order_sans = (std::string) fonts_config["family_order"];
-	family_order_mono = (std::string) fonts_config["family_order_monospace"];
+	family_order_sans = static_cast<std::string>(fonts_config["family_order"]);
+	family_order_mono = static_cast<std::string>(fonts_config["family_order_monospace"]);
 
 	if(family_order_mono.empty()) {
 		ERR_FT << "No monospace font family order defined, falling back to sans serif order\n";
