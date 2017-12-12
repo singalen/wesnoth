@@ -380,6 +380,7 @@ void sdl_event_handler::handle_event(const SDL_Event& event)
 	}
 
 	Uint8 button = event.button.button;
+	CVideo& video = dynamic_cast<window&>(*dispatchers_.back()).video();
 
 	switch(event.type) {
 		case SDL_MOUSEMOTION:
@@ -483,7 +484,7 @@ void sdl_event_handler::handle_event(const SDL_Event& event)
 
 		case SDL_FINGERMOTION:
 			{
-				SDL_Rect r = screen_area();
+				SDL_Rect r = video.screen_area();
 				touch_motion(point(event.tfinger.x * r.w, event.tfinger.y * r.h),
 							 point(event.tfinger.dx * r.w, event.tfinger.dy * r.h));
 			}
@@ -491,21 +492,21 @@ void sdl_event_handler::handle_event(const SDL_Event& event)
 
 		case SDL_FINGERUP:
 			{
-				SDL_Rect r = screen_area();
+				SDL_Rect r = video.screen_area();
 				touch_up(point(event.tfinger.x * r.w, event.tfinger.y * r.h));
 			}
 			break;
 
 		case SDL_FINGERDOWN:
 			{
-				SDL_Rect r = screen_area();
+				SDL_Rect r = video.screen_area();
 				touch_down(point(event.tfinger.x * r.w, event.tfinger.y * r.h));
 			}
 			break;
 
 		case SDL_MULTIGESTURE:
 			{
-				SDL_Rect r = screen_area();
+				SDL_Rect r = video.screen_area();
 				touch_multi_gesture(point(event.mgesture.x * r.w, event.mgesture.y * r.h),
 									event.mgesture.dTheta, event.mgesture.dDist, event.mgesture.numFingers);
 			}
