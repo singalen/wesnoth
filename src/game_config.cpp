@@ -37,19 +37,26 @@ namespace game_config
 //
 // Path and revision info
 //
-const std::string version = VERSION;
 
 const version_info wesnoth_version(VERSION);
 const version_info min_savegame_version(MIN_SAVEGAME_VERSION);
 const version_info test_version("test");
 
-#ifdef REVISION
+#ifdef __IPHONEOS__
+#define WESNOTH_XSTR(x) WESNOTH_STR(x)
+#define WESNOTH_STR(x) #x
+#undef VERSION
+#define VERSION WESNOTH_XSTR(RC_VERSION_MAJOR) "." WESNOTH_XSTR(RC_VERSION_MINOR) "." WESNOTH_XSTR(RC_VERSION_REVISION)
+const std::string revision = std::string(VERSION);// + " (" + VCS_SHORT_HASH ")";
+#elif defined(REVISION)
 const std::string revision = VERSION " (" REVISION ")";
 #elif defined(VCS_SHORT_HASH) && defined(VCS_WC_MODIFIED)
 const std::string revision = std::string(VERSION) + " (" + VCS_SHORT_HASH + (VCS_WC_MODIFIED ? "-Modified" : "-Clean") + ")";
 #else
 const std::string revision = VERSION;
 #endif
+
+const std::string version = VERSION;
 
 #ifdef WESNOTH_PATH
 std::string path = WESNOTH_PATH;
