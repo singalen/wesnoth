@@ -816,9 +816,16 @@ void mouse_handler::select_or_action(bool browse)
 
 	unit_map::iterator clicked_u = find_unit(last_hex_);
 	unit_map::iterator selected_u = find_unit(selected_hex_);
+	if ( clicked_u &&
+		 clicked_u == selected_u) {
+		deselect_hex();
+		return;
+	}
 
-	if(clicked_u && (!selected_u || selected_u->side() != side_num_ ||
-	  (clicked_u->side() == side_num_ && clicked_u->id() != selected_u->id()))
+	if ( clicked_u &&
+		 (!selected_u ||
+		  selected_u->side() != side_num_ ||
+ 		  (clicked_u->side() == side_num_ &&clicked_u->id() != selected_u->id()) )
 	) {
 		select_hex(last_hex_, false);
 	} else {
