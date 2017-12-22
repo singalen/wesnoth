@@ -553,7 +553,7 @@ void command_executor::execute_command(const SDL_Event& event, int index)
 	bool keypress = (event.type == SDL_KEYDOWN || event.type == SDL_TEXTINPUT) &&
 		!press_event_sent_;
 	bool press = keypress ||
-		(event.type == SDL_JOYBUTTONDOWN || event.type == SDL_MOUSEBUTTONDOWN);
+		(event.type == SDL_JOYBUTTONDOWN || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_FINGERDOWN);
 	if(press) {
 		LOG_HK << "sending press event (keypress = " <<
 			std::boolalpha << keypress << std::noboolalpha << ")\n";
