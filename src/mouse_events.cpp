@@ -135,18 +135,12 @@ void mouse_handler::touch_motion(int x, int y, const bool browse, bool update, m
 										 + std::pow(static_cast<double>(drag_from_y_- my), 2);
 			if (drag_distance > drag_threshold()*drag_threshold()) {
 				dragging_started_ = true;
-				printf("touch_motion dragging_started_ = true;\n");
 //				cursor::set_dragging(true);
 			}
 		}
 	}
-	
-	if (!is_dragging()) {
-		printf("insane!\n");
-	}
-	
+
 	// my own panning...
-	
 	bool selected_hex_has_unit = find_unit(selected_hex_).valid();
 	if (!selected_hex_has_unit && is_dragging() && dragging_started_) {
 		// Here, naive pan. In general, is it a problem that panning is synchronous?
@@ -158,8 +152,7 @@ void mouse_handler::touch_motion(int x, int y, const bool browse, bool update, m
 		
 		int dx = drag_from_x_ - mx;
 		int dy = drag_from_y_ - my;
-		
-		printf("Dragging by %d,%d \n", dx, dy);
+
 		gui().scroll(dx, dy);
 		drag_from_x_ = mx;
 		drag_from_y_ = my;
