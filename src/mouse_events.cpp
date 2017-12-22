@@ -206,7 +206,7 @@ void mouse_handler::touch_motion(int x, int y, const bool browse, bool update, m
 		gui().set_route(nullptr);
 		pc_.get_whiteboard()->erase_temp_move();
 	}
-	
+
 	gui().highlight_hex(new_hex);
 	pc_.get_whiteboard()->on_mouseover_change(new_hex);
 	
@@ -218,7 +218,7 @@ void mouse_handler::touch_motion(int x, int y, const bool browse, bool update, m
 		wb::future_map_if_active planned_unit_map;
 		selected_unit = find_unit(selected_hex_);
 		mouseover_unit = find_unit(new_hex);
-		
+
 		// we search if there is an attack possibility and where
 		attack_from = current_unit_attacks_from(new_hex);
 		
@@ -798,9 +798,16 @@ void mouse_handler::select_or_action(bool browse)
 
 	unit_map::iterator clicked_u = find_unit(last_hex_);
 	unit_map::iterator selected_u = find_unit(selected_hex_);
+	if ( clicked_u &&
+		 clicked_u == selected_u) {
+		deselect_hex();
+		return;
+	}
 
-	if(clicked_u && (!selected_u || selected_u->side() != side_num_ ||
-	  (clicked_u->side() == side_num_ && clicked_u->id() != selected_u->id()))
+	if ( clicked_u &&
+		 (!selected_u ||
+		  selected_u->side() != side_num_ ||
+ 		  (clicked_u->side() == side_num_ &&clicked_u->id() != selected_u->id()) )
 	) {
 		select_hex(last_hex_, false);
 	} else {
