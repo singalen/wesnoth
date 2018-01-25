@@ -273,6 +273,8 @@ if(APPLE)
 	set(libwesnoth-game_STAT_SRC
 		${libwesnoth-game_STAT_SRC}
 		desktop/apple_notification.mm
+		macosx/SDLMain.mm
+		macosx/SDLMain.h
 	)
 endif(APPLE)
 
