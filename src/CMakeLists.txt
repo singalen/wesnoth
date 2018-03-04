@@ -266,7 +266,11 @@ endif(WIN32)
 if(APPLE)
 	set(libwesnoth-game_STAT_SRC
 		${libwesnoth-game_STAT_SRC}
+		macosx/SDLMain.mm
+		macosx/SDLMain.h
 		desktop/apple_notification.mm
+		ios/ios_device.cpp
+		ios/ios_device.h
 	)
 endif(APPLE)
 
