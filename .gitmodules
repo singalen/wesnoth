@@ -1,0 +1,4 @@
+[submodule "projectfiles/Xcode-iOS"]
+	path = projectfiles/Xcode-iOS
+	url = https://github.com/singalen/wesnoth_ios
+	branch = iphone_resurrection
