@@ -231,12 +231,15 @@ void mouse_handler_base::mouse_press(const SDL_MouseButtonEvent& event, const bo
 
 bool mouse_handler_base::is_left_click(const SDL_MouseButtonEvent& event) const
 {
-	return (event.button == SDL_BUTTON_LEFT && !command_active())
-			&& event.which != SDL_TOUCH_MOUSEID
 #ifdef MOUSE_TOUCH_EMULATION
-			|| event.button == SDL_BUTTON_RIGHT
+	if(event.button == SDL_BUTTON_RIGHT) {
+		return true;
+	}
 #endif
-	;
+	if(event.which == SDL_TOUCH_MOUSEID) {
+		return false;
+	}
+	return event.button == SDL_BUTTON_LEFT && !command_active();
 }
 
 bool mouse_handler_base::is_middle_click(const SDL_MouseButtonEvent& event) const
@@ -250,7 +253,7 @@ bool mouse_handler_base::is_right_click(const SDL_MouseButtonEvent& event) const
 	(void) event;
 	return false;
 #else
-    if (event.which == SDL_TOUCH_MOUSEID) {
+    if(event.which == SDL_TOUCH_MOUSEID) {
 		return false;
 	}
 	return event.button == SDL_BUTTON_RIGHT
