@@ -219,10 +219,6 @@ void CVideo::update_framebuffer()
 
 void CVideo::init_window()
 {
-	// Position
-	const int x = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
-	const int y = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
-
 	// Dimensions
 	const point res = preferences::resolution();
 	const int w = res.x;
@@ -230,18 +226,26 @@ void CVideo::init_window()
 
 	uint32_t window_flags = 0;
 
+#ifndef __IPHONEOS__
 	// Add any more default flags here
 	window_flags |= SDL_WINDOW_RESIZABLE;
+
+	// Position
+	const int x = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
+	const int y = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
 
 	if(preferences::fullscreen()) {
 		window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 	} else if(preferences::maximized()) {
 		window_flags |= SDL_WINDOW_MAXIMIZED;
 	}
-	
-#ifdef __IPHONEOS__
+#else
 	// Hide iOS status bar
 	window_flags |= SDL_WINDOW_BORDERLESS;
+
+	// Otherwise, SDL 2.0.5 on iOS crashes.
+	const int x = SDL_WINDOWPOS_CENTERED;
+	const int y = SDL_WINDOWPOS_CENTERED;
 #endif
 
 	// Initialize window
