@@ -219,8 +219,8 @@ void CVideo::update_framebuffer()
 void CVideo::init_window()
 {
 	// Position
-	const int x = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
-	const int y = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
+	int x = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
+	int y = preferences::fullscreen() ? SDL_WINDOWPOS_UNDEFINED : SDL_WINDOWPOS_CENTERED;
 
 	// Dimensions
 	const point res = preferences::resolution();
@@ -241,6 +241,9 @@ void CVideo::init_window()
 #ifdef __IPHONEOS__
 	// Hide iOS status bar
 	window_flags |= SDL_WINDOW_BORDERLESS;
+	// SDL_WINDOWPOS_UNDEFINED crashes iOS in an unpredictable ways. Thanks @Hrubymar10 for finding the problem!
+	x = SDL_WINDOWPOS_CENTERED;
+	y = SDL_WINDOWPOS_CENTERED;
 #endif
 
 	// Initialize window
