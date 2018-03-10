@@ -395,7 +395,12 @@ bool maximized()
 
 bool fullscreen()
 {
+#ifndef __IPHONEOS__
 	return get("fullscreen", true);
+#else
+	return get("fullscreen", false);
+#endif
+
 }
 
 void _set_resolution(const point& res)
