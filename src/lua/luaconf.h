@@ -10,6 +10,7 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include "wesnoth_lua_config.h"
 
 
 /*
