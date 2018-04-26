@@ -216,7 +216,13 @@ bool playsingle_controller::hotkey_handler::can_execute_command(const hotkey::ho
 			return !events::commands_disabled || (playsingle_controller_.is_replay() && events::commands_disabled <  2);
 		case hotkey::HOTKEY_UNIT_HOLD_POSITION:
 		case hotkey::HOTKEY_END_UNIT_TURN:
-			return !browse() && !linger() && !events::commands_disabled;
+			if(browse() || events::commands_disabled || linger())
+				return false;
+
+			if(menu_handler_.current_unit().valid()
+				&& (menu_handler_.current_unit()->movement_left() > 0))
+				return true;
+			return false;
 		case hotkey::HOTKEY_RECRUIT:
 		case hotkey::HOTKEY_REPEAT_RECRUIT:
 		case hotkey::HOTKEY_RECALL:
