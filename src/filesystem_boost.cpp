@@ -571,6 +571,46 @@ static void migrate_apple_config_directory_for_unsandboxed_builds()
 }
 #endif
 
+/// Remove me eventually.
+static void migrate_1_13_saves()
+{
+#ifdef __IPHONEOS__
+	char *sdl_pref_path = SDL_GetPrefPath("wesnoth.org", "iWesnoth");
+	if(sdl_pref_path) {
+		boost::filesystem::path old_saves_dir(sdl_pref_path);
+		SDL_free(sdl_pref_path);
+
+		old_saves_dir /= ".wesnoth1.13";
+		old_saves_dir /= "saves";
+
+		if (!is_directory(old_saves_dir)) {
+			std::cerr << old_saves_dir << " not found\n";
+			return;
+		}
+
+		boost::filesystem::path current_saves_dir =  user_data_dir / "saves";
+
+		std::cerr << "Copying files from " << old_saves_dir << " to " << current_saves_dir << "\n";
+        error_code ec;
+
+		for(auto& old_save : boost::make_iterator_range(bfs::directory_iterator(old_saves_dir), {})) {
+			try {
+				std::cerr << "Moving " << old_save << "\n";
+				bfs::copy_file(
+						old_save,
+						current_saves_dir / old_save.path().filename(),
+						// Don't overwrite if exists.
+						bfs::copy_option::none);
+                bfs::remove(old_save, ec);
+			}
+			catch (const boost::system::system_error &err) {
+				std::cerr << "Not copied\n";
+			}
+		}
+	}
+#endif
+}
+
 static void setup_user_data_dir()
 {
 #if defined(__APPLE__) && !defined(__IPHONEOS__)
@@ -591,6 +631,8 @@ static void setup_user_data_dir()
 	create_directory_if_missing(user_data_dir / "data" / "add-ons");
 	create_directory_if_missing(user_data_dir / "saves");
 	create_directory_if_missing(user_data_dir / "persist");
+
+	migrate_1_13_saves();
 
 #ifdef _WIN32
 	lg::finish_log_file_setup();
