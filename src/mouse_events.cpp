@@ -1472,6 +1472,18 @@ bool mouse_handler::unit_in_cycle(unit_map::const_iterator it)
 	return true;
 }
 
+bool mouse_handler::can_cycle_units()
+{
+	game_board& board = pc_.gamestate().board_;
+	for(unit_map::const_iterator it = board.units().begin(); it != board.units().end(); it++) {
+		if(unit_in_cycle(it)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void mouse_handler::cycle_units(const bool browse, const bool reverse)
 {
 	game_board& board = pc_.gamestate().board_;
