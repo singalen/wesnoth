@@ -223,6 +223,8 @@ bool playsingle_controller::hotkey_handler::can_execute_command(const hotkey::ho
 				&& (menu_handler_.current_unit()->movement_left() > 0))
 				return true;
 			return false;
+		case hotkey::HOTKEY_CYCLE_UNITS:
+			return mouse_handler_.can_cycle_units();
 		case hotkey::HOTKEY_RECRUIT:
 		case hotkey::HOTKEY_REPEAT_RECRUIT:
 		case hotkey::HOTKEY_RECALL:
