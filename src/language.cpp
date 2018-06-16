@@ -43,7 +43,11 @@ namespace {
 	language_def current_language;
 	std::vector<config> languages_;
 	utils::string_map strings_;
+#ifndef __IPHONEOS__
 	int min_translation_percent = 80;
+#else
+	int min_translation_percent = 50;
+#endif
 }
 
 static language_list known_languages;
