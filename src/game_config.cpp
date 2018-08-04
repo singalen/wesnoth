@@ -212,7 +212,9 @@ std::string
 	game_title,
 	game_title_background,
 	game_logo,
+    game_logo_tiny,
 	game_logo_background,
+    game_logo_background_tiny,
 	victory_laurel,
 	victory_laurel_hardest,
 	victory_laurel_easy,
@@ -342,10 +344,12 @@ void load_config(const config &v)
 	if(const config& i = v.child("images")){
 		using namespace game_config::images;
 
-		game_title            = i["game_title"].str();
-		game_title_background = i["game_title_background"].str();
-		game_logo             = i["game_logo"].str();
-		game_logo_background  = i["game_logo_background"].str();
+		game_title                = i["game_title"].str();
+		game_title_background     = i["game_title_background"].str();
+		game_logo                 = i["game_logo"].str();
+        game_logo_tiny            = i["game_logo_tiny"].str();
+		game_logo_background      = i["game_logo_background"].str();
+        game_logo_background_tiny = i["game_logo_background_tiny"].str();
 
 		victory_laurel = i["victory_laurel"].str();
 		victory_laurel_hardest = i["victory_laurel_hardest"].str();
