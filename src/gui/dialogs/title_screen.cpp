@@ -254,14 +254,15 @@ void title_screen::pre_show(window& win)
 
 	win.get_canvas(0).set_variable("background_image", wfl::variant(game_config::images::game_title_background));
 
-	image* logo_bg = find_widget<image>(&win, "logo-bg", false, false);
-	if(logo_bg != nullptr) {
-		logo_bg->set_image(game_config::images::game_logo_background);
-	}
-	image* logo = find_widget<image>(&win, "logo", false, false);
-	if(logo != nullptr) {
-		logo->set_image(game_config::images::game_logo);
-	}
+	//FIXME: This workaround is not ideal
+    const point res = preferences::resolution();
+    if (res.x >= 800 && res.y >= 600) {
+        find_widget<image>(&win, "logo-bg", false).set_image(game_config::images::game_logo_background);
+        find_widget<image>(&win, "logo", false).set_image(game_config::images::game_logo);
+    } else {
+        find_widget<image>(&win, "logo-bg-tiny", false).set_image(game_config::images::game_logo_background_tiny);
+        find_widget<image>(&win, "logo-tiny", false).set_image(game_config::images::game_logo_tiny);
+    }
 
 	//
 	// Version string
