@@ -247,7 +247,10 @@ void CVideo::init_window()
 
 	std::cerr << "Setting mode to " << w << "x" << h << std::endl;
 
+#if !defined(__IPHONEOS__)
+// iOS doesn't resize its screen!
 	window->set_minimum_size(preferences::min_window_width, preferences::min_window_height);
+#endif
 
 	SDL_DisplayMode currentDisplayMode;
 	SDL_GetCurrentDisplayMode(window->get_display_index(), &currentDisplayMode);
