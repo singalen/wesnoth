@@ -572,6 +572,10 @@ int window::show(const bool restore, const unsigned auto_close_timeout)
 			SDL_Delay(10);
 		}
 	}
+	catch(const wml_exception& e) {
+		auto& window = *this;
+		DBG_GUI_L << LOG_IMPL_HEADER << "WML exception:\nUser message: " << e.user_message << "\nDev message: " << e.dev_message << '\n';
+	}
 	catch(...)
 	{
 		/**
