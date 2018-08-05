@@ -66,8 +66,8 @@ namespace preferences {
  *
  * Add any variables of similar type here.
  */
-const int min_window_width  = 800;
-const int min_window_height = 600;
+const int min_window_width  = 480;
+const int min_window_height = 320;
 
 const int def_window_width  = 1280;
 const int def_window_height = 720;
