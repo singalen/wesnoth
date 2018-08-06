@@ -717,7 +717,11 @@ bool set_music(bool ison) {
 
 bool stop_music_in_background()
 {
+#if defined(__IPHONEOS__)
 	return get("stop_music_in_background", true);
+#else
+    return get("stop_music_in_background", false);
+#endif
 }
 
 void set_stop_music_in_background(bool ison)
