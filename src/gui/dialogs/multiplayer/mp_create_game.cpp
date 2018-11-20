@@ -326,15 +326,16 @@ void mp_create_game::pre_show(window& win)
 	//
 	// Set up tab control
 	//
-	listbox& tab_bar = find_widget<listbox>(&win, "tab_bar", false);
+	listbox* tab_bar = find_widget<listbox>(&win, "tab_bar", false, false);
 
-	connect_signal_notify_modified(tab_bar,
-		std::bind(&mp_create_game::on_tab_select, this, std::ref(win)));
+	if(tab_bar) {
+		connect_signal_notify_modified(*tab_bar, std::bind(&mp_create_game::on_tab_select, this, std::ref(win)));
 
-	// Allow the settings stack to find widgets in all pages, regardless of which is selected.
-	// This ensures settings (especially game settings) widgets are appropriately updated when
-	// a new game is selected, regardless of which settings tab is active at the time.
-	find_widget<stacked_widget>(&win, "pager", false).set_find_in_all_layers(true);
+		// Allow the settings stack to find widgets in all pages, regardless of which is selected.
+		// This ensures settings (especially game settings) widgets are appropriately updated when
+		// a new game is selected, regardless of which settings tab is active at the time.
+		find_widget<stacked_widget>(&win, "pager", false).set_find_in_all_layers(true);
+	}
 
 	// We call on_tab_select farther down.
 
@@ -351,8 +352,10 @@ void mp_create_game::pre_show(window& win)
 	// This handles the initial game selection as well
 	display_games_of_type(win, level_types_[get_initial_type_index()].first, preferences::level());
 
-	// Initial tab selection must be done after game selection so the field widgets are set to their correct active state.
-	on_tab_select(win);
+	if(tab_bar) {
+		// Initial tab selection must be done after game selection so the field widgets are set to their correct active state.
+		on_tab_select(win);
+	}
 
 	//
 	// Set up the Lua plugin context
@@ -547,8 +550,14 @@ void mp_create_game::on_game_select(window& window)
 
 void mp_create_game::on_tab_select(window& window)
 {
-	const int i = find_widget<listbox>(&window, "tab_bar", false).get_selected_row();
-	find_widget<stacked_widget>(&window, "pager", false).select_layer(i);
+	auto* tab_bar = find_widget<listbox>(&window, "tab_bar", false, false);
+	if(tab_bar) {
+		const int i = tab_bar->get_selected_row();
+		auto stacked = find_widget<stacked_widget>(&window, "pager", false, false);
+		if(stacked) {
+			stacked->select_layer(i);
+		}
+	}
 }
 
 void mp_create_game::on_mod_toggle(window& window, const int index, toggle_button* sender)
@@ -842,7 +851,10 @@ void mp_create_game::post_show(window& window)
 	plugins_context_.reset();
 
 	// Show all tabs so that find_widget works correctly
-	find_widget<stacked_widget>(&window, "pager", false).select_layer(-1);
+	stacked_widget* widget = find_widget<stacked_widget>(&window, "pager", false, false);
+	if(widget) {
+		widget->select_layer(-1);
+	}
 
 	if(get_retval() == LOAD_GAME) {
 		create_engine_.prepare_for_saved_game();
