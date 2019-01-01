@@ -514,11 +514,13 @@ void title_screen::button_callback_multiplayer(window& window)
 
 		const int res = dlg.get_choice();
 
+#if !defined(__IPHONEOS__) && !defined(MOUSE_TOUCH_EMULATION)
 		if(res == 2 && preferences::mp_server_warning_disabled() < 2) {
 			if(!gui2::dialogs::mp_host_game_prompt::execute()) {
 				continue;
 			}
 		}
+#endif
 
 		switch(res) {
 		case 0:
@@ -530,8 +532,12 @@ void title_screen::button_callback_multiplayer(window& window)
 			window.set_retval(MP_CONNECT);
 			break;
 		case 2:
+#if !defined(__IPHONEOS__) && !defined(MOUSE_TOUCH_EMULATION)
 			game_.select_mp_server("localhost");
 			window.set_retval(MP_HOST);
+#else
+			window.set_retval(MP_LOCAL);
+#endif
 			break;
 		case 3:
 			window.set_retval(MP_LOCAL);
