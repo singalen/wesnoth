@@ -595,7 +595,7 @@ public:
 		this_type& operator-=(difference_type n) { i_ -= n; return *this; }
 
 		reference operator[](difference_type n) const { return any_child(&i_[n].pos->first, i_[n].pos->second[i_->index].get()); }
-		friend difference_type operator-(const this_type& a, const this_type& b) { return a.i_ - b.i_; }
+		friend difference_type operator-(const this_type& a, const this_type& b) { return static_cast<difference_type> (a.i_ - b.i_); }
 		friend this_type operator-(const this_type& a, difference_type n) { return this_type(a.i_ - n); }
 		friend this_type operator+(const this_type& a, difference_type n) { return this_type(a.i_ + n); }
 		friend this_type operator+(difference_type n, const this_type& a) { return this_type(a.i_ + n); }
@@ -648,7 +648,7 @@ public:
 		this_type& operator-=(difference_type n) { i_ -= n; return *this; }
 
 		reference operator[](difference_type n) const { return any_child(&i_[n].pos->first, i_[n].pos->second[i_->index].get()); }
-		friend difference_type operator-(const this_type& a, const this_type& b) { return a.i_ - b.i_; }
+		friend difference_type operator-(const this_type& a, const this_type& b) { return static_cast<difference_type> (a.i_ - b.i_); }
 		friend this_type operator-(const this_type& a, difference_type n) { return this_type(a.i_ - n); }
 		friend this_type operator+(const this_type& a, difference_type n) { return this_type(a.i_ + n); }
 		friend this_type operator+(difference_type n, const this_type& a) { return this_type(a.i_ + n); }
