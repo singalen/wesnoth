@@ -41,7 +41,7 @@ namespace apple {
 		NSArray *version_array = [[[NSProcessInfo processInfo] operatingSystemVersionString] componentsSeparatedByString:@" "];
 
 #if defined(__IPHONEOS__)
-		std::string version_string = "iOS ";
+		version_string = "iOS ";
 #else
 		const version_info version_info([[version_array objectAtIndex:1] UTF8String]);
 
