@@ -742,53 +742,55 @@ void preferences_dialog::post_build(window& window)
 	// HOTKEYS PANEL
 	//
 
-	std::vector<config> hotkey_category_entries;
-	for(const auto& name : cat_names_) {
-		hotkey_category_entries.emplace_back("label", name.second, "checkbox", false);
+	multimenu_button* hotkey_menu = find_widget<multimenu_button>(&window, "hotkey_category_menu", false, false);
+	
+	if(hotkey_menu) {
+		std::vector<config> hotkey_category_entries;
+		for(const auto& name : cat_names_) {
+			hotkey_category_entries.emplace_back("label", name.second, "checkbox", false);
+		}
+	
+		hotkey_menu->set_values(hotkey_category_entries);
+	
+		connect_signal_notify_modified(*hotkey_menu,
+			std::bind(&preferences_dialog::hotkey_filter_callback, this, std::ref(window)));
+	
+		listbox& hotkey_list = setup_hotkey_list(window);
+	
+		text_box& filter = find_widget<text_box>(&window, "filter", false);
+		filter.set_text_changed_callback(std::bind(&preferences_dialog::on_filtertext_changed, this, _1));
+	
+		// Action column
+		hotkey_list.register_translatable_sorting_option(0, [this](const int i) { return visible_hotkeys_[i]->description.str(); });
+	
+		// Hotkey column
+		hotkey_list.register_sorting_option(1, [this](const int i) { return hotkey::get_names(visible_hotkeys_[i]->command); });
+	
+		// Scope columns
+		hotkey_list.register_sorting_option(2, [this](const int i) { return !visible_hotkeys_[i]->scope[hotkey::SCOPE_GAME]; });
+		hotkey_list.register_sorting_option(3, [this](const int i) { return !visible_hotkeys_[i]->scope[hotkey::SCOPE_EDITOR]; });
+		hotkey_list.register_sorting_option(4, [this](const int i) { return !visible_hotkeys_[i]->scope[hotkey::SCOPE_MAIN_MENU]; });
+	
+		hotkey_list.set_active_sorting_option({0, listbox::SORT_ASCENDING}, true);
+	
+		connect_signal_mouse_left_click(
+			find_widget<button>(&window, "btn_add_hotkey", false), std::bind(
+				&preferences_dialog::add_hotkey_callback,
+				this,
+				std::ref(hotkey_list)));
+	
+		connect_signal_mouse_left_click(
+			find_widget<button>(&window, "btn_clear_hotkey", false), std::bind(
+				&preferences_dialog::remove_hotkey_callback,
+				this,
+				std::ref(hotkey_list)));
+	
+		connect_signal_mouse_left_click(
+			find_widget<button>(&window, "btn_reset_hotkeys", false), std::bind(
+				&preferences_dialog::default_hotkey_callback,
+				this,
+				std::ref(window)));
 	}
-
-	multimenu_button& hotkey_menu = find_widget<multimenu_button>(&window, "hotkey_category_menu", false);
-
-	hotkey_menu.set_values(hotkey_category_entries);
-
-	connect_signal_notify_modified(hotkey_menu,
-		std::bind(&preferences_dialog::hotkey_filter_callback, this, std::ref(window)));
-
-	listbox& hotkey_list = setup_hotkey_list(window);
-
-	text_box& filter = find_widget<text_box>(&window, "filter", false);
-	filter.set_text_changed_callback(std::bind(&preferences_dialog::on_filtertext_changed, this, _1));
-
-	// Action column
-	hotkey_list.register_translatable_sorting_option(0, [this](const int i) { return visible_hotkeys_[i]->description.str(); });
-
-	// Hotkey column
-	hotkey_list.register_sorting_option(1, [this](const int i) { return hotkey::get_names(visible_hotkeys_[i]->command); });
-
-	// Scope columns
-	hotkey_list.register_sorting_option(2, [this](const int i) { return !visible_hotkeys_[i]->scope[hotkey::SCOPE_GAME]; });
-	hotkey_list.register_sorting_option(3, [this](const int i) { return !visible_hotkeys_[i]->scope[hotkey::SCOPE_EDITOR]; });
-	hotkey_list.register_sorting_option(4, [this](const int i) { return !visible_hotkeys_[i]->scope[hotkey::SCOPE_MAIN_MENU]; });
-
-	hotkey_list.set_active_sorting_option({0, listbox::SORT_ASCENDING}, true);
-
-	connect_signal_mouse_left_click(
-		find_widget<button>(&window, "btn_add_hotkey", false), std::bind(
-			&preferences_dialog::add_hotkey_callback,
-			this,
-			std::ref(hotkey_list)));
-
-	connect_signal_mouse_left_click(
-		find_widget<button>(&window, "btn_clear_hotkey", false), std::bind(
-			&preferences_dialog::remove_hotkey_callback,
-			this,
-			std::ref(hotkey_list)));
-
-	connect_signal_mouse_left_click(
-		find_widget<button>(&window, "btn_reset_hotkeys", false), std::bind(
-			&preferences_dialog::default_hotkey_callback,
-			this,
-			std::ref(window)));
 }
 
 listbox& preferences_dialog::setup_hotkey_list(window& window)
