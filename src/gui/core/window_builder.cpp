@@ -454,6 +454,7 @@ widget* builder_grid::build(const replacements_map& replacements) const
 grid* builder_grid::build(grid* grid) const
 {
 	grid->set_id(id);
+	grid->set_visible(widget::parse_visibility(this->visibility));
 	grid->set_linked_group(linked_group);
 	grid->set_rows_cols(rows, cols);
 
