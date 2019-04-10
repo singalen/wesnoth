@@ -668,10 +668,11 @@ void pump()
 			// Always make sure a cursor is displayed if the mouse moves or if the user clicks
 			cursor::set_focus(true);
 			if(event.button.button == SDL_BUTTON_LEFT || event.button.which == SDL_TOUCH_MOUSEID) {
-				static const int DoubleClickTime = 500;
 #ifdef __IPHONEOS__
+				static const int DoubleClickTime = 200;
 				static const int DoubleClickMaxMove = 15;
 #else
+				static const int DoubleClickTime = 500;
 				static const int DoubleClickMaxMove = 3;
 #endif
 
