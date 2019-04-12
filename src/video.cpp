@@ -243,6 +243,8 @@ void CVideo::init_window()
 #else
 	// Hide iOS status bar
 	window_flags |= SDL_WINDOW_BORDERLESS;
+    window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+    window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 	// Otherwise, SDL 2.0.5 on iOS crashes.
 	const int x = SDL_WINDOWPOS_CENTERED;
