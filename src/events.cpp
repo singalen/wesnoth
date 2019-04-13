@@ -518,7 +518,7 @@ void pump()
 			// TODO: Implement SDL_MULTIGESTURE. Some day.
 			case SDL_MOUSEMOTION:
 				if(event.motion.which != SDL_TOUCH_MOUSEID && event.motion.state == 0) {
-					return;
+					break;
 				}
 
 				if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
