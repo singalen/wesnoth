@@ -74,7 +74,7 @@ bool on_wine()
 }
 #endif
 
-#if defined(_X11)
+#if defined(_X11) && !defined(__APPLE__)
 /**
  * Release policy for POSIX pipe streams opened with popen(3).
  */
