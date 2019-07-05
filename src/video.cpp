@@ -256,10 +256,8 @@ void CVideo::init_window()
 
 	std::cerr << "Setting mode to " << w << "x" << h << std::endl;
 
-#if defined(__IPHONEOS__)
-	//disable minimum window size on iOS
-	window->set_minimum_size(w, h);
-#else
+#if !defined(__IPHONEOS__)
+// iOS doesn't resize its screen!
 	window->set_minimum_size(preferences::min_window_width, preferences::min_window_height);
 #endif
 
