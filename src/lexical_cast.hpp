@@ -282,14 +282,16 @@ struct lexical_caster<
 	To operator()(const std::string& value, boost::optional<To> fallback) const
 	{
 		DEBUG_THROW("specialized - To signed - From std::string");
-
-		try {
-			long res = std::stol(value);
-			if(std::numeric_limits<To>::lowest() <= res && std::numeric_limits<To>::max() >= res) {
-				return static_cast<To>(res);
+		
+		if(!value.empty()) {
+			try {
+				long res = std::stol(value);
+				if(std::numeric_limits<To>::lowest() <= res && std::numeric_limits<To>::max() >= res) {
+					return static_cast<To>(res);
+				}
+			} catch(const std::invalid_argument&) {
+			} catch(const std::out_of_range&) {
 			}
-		} catch(const std::invalid_argument&) {
-		} catch(const std::out_of_range&) {
 		}
 
 		if(fallback) {
