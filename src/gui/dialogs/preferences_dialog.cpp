@@ -150,7 +150,11 @@ void preferences_dialog::on_filtertext_changed(text_box_base* textbox)
 void preferences_dialog::set_resolution_list(menu_button& res_list, CVideo& video)
 {
 	resolutions_ = video.get_available_resolutions(true);
-
+#define IPHONE_TEST
+#ifdef IPHONE_TEST
+	resolutions_.insert(resolutions_.begin(), point(667, 375));
+	resolutions_.insert(resolutions_.begin(), point(568, 320));
+#endif
 	std::vector<config> options;
 	for(const point& res : resolutions_) {
 		config option;
