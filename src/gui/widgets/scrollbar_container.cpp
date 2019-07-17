@@ -190,7 +190,7 @@ void scrollbar_container::request_reduce_height(const unsigned maximum_height)
 	// If showing the scrollbar increased the height, hide and abort.
 	if(resized && scrollbar_size.y > size.y) {
 		vertical_scrollbar_grid_->set_visible(widget::visibility::invisible);
-		DBG_GUI_L << LOG_HEADER << " request failed, showing the scrollbar"
+		WRN_GUI_L << LOG_HEADER << " request failed, showing the scrollbar"
 				  << " increased the height to " << scrollbar_size.y << ".\n";
 		return;
 	}
@@ -261,7 +261,7 @@ void scrollbar_container::request_reduce_width(const unsigned maximum_width)
 	// If showing the scrollbar increased the width, hide and abort.
 	if(horizontal_scrollbar_mode_ == AUTO_VISIBLE_FIRST_RUN && scrollbar_size.x > size.x) {
 		horizontal_scrollbar_grid_->set_visible(widget::visibility::invisible);
-		DBG_GUI_L << LOG_HEADER << " request failed, showing the scrollbar"
+		WRN_GUI_L << LOG_HEADER << " request failed, showing the scrollbar"
 				  << " increased the width to " << scrollbar_size.x << ".\n";
 		return;
 	}
@@ -272,7 +272,12 @@ void scrollbar_container::request_reduce_width(const unsigned maximum_width)
 		size.x = scrollbar_size.x;
 	}
 
-	size.x = std::max(size.x, get_grid().get_best_size().x);
+	auto best_x = get_grid().get_best_size().x;
+	if (best_x > size.x) {
+		WRN_GUI_L << LOG_HEADER << " Best size doesn't fit, showing the scrollbar"
+				  << " increased the width to " << best_x << ".\n";
+	}
+	size.x = std::max(size.x, best_x);
 
 	// FIXME adjust for the step size of the scrollbar
 
