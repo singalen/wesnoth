@@ -50,7 +50,11 @@ const version_info test_version("test");
 #define VERSION WESNOTH_XSTR(RC_VERSION_MAJOR) "." WESNOTH_XSTR(RC_VERSION_MINOR) "." WESNOTH_XSTR(RC_VERSION_REVISION)
 const std::string revision = std::string(VERSION);// + " (" + VCS_SHORT_HASH ")";
 #elif defined(__IPHONEOS__) && defined(DEBUG)
+#ifdef LOAD_REVISION
     const std::string revision = std::string(VERSION) + " (" + std::string(VCS_FULL_HASH).substr(0,7) + (VCS_WC_MODIFIED ? "-Modified" : "-Clean") + ")";
+#else
+    const std::string revision = std::string(VERSION);
+#endif
 #elif defined(REVISION)
 const std::string revision = VERSION " (" REVISION ")";
 #elif defined(VCS_SHORT_HASH) && defined(VCS_WC_MODIFIED)
