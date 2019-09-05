@@ -33,6 +33,11 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/system/windows_error.hpp>
 
+#ifdef __IPHONEOS__
+#include <ctime>
+#include "ios/ios_filesystem.h"
+#endif
+
 #ifdef _WIN32
 #include "log_windows.hpp"
 
@@ -522,7 +527,7 @@ std::string get_next_filename(const std::string& name, const std::string& extens
 	return next_filename;
 }
 
-static bfs::path user_data_dir, user_config_dir, cache_dir;
+static bfs::path user_data_dir, user_saves_dir, user_config_dir, cache_dir;
 
 static const std::string& get_version_path_suffix()
 {
@@ -611,6 +616,57 @@ static void migrate_1_13_saves()
 #endif
 }
 
+/// Remove me eventually.
+void icloud_upload_saves()
+{
+#ifdef __IPHONEOS__
+    char *sdl_doc_path = Wesnoth_GetDocumentsPath("wesnoth.org", "iWesnoth");
+    if(sdl_doc_path) {
+        boost::filesystem::path current_saves_dir = user_data_dir / "saves";
+        boost::filesystem::path icloud_saves_dir(sdl_doc_path);
+        icloud_saves_dir /= "saves";
+        SDL_free(sdl_doc_path);
+        
+        if (!is_directory(current_saves_dir)) {
+            return;
+        }
+        
+        std::cerr << "Copying files from " << current_saves_dir << " to " << icloud_saves_dir << "\n";
+        error_code ec;
+        
+        for(auto& old_save : boost::make_iterator_range(bfs::directory_iterator(current_saves_dir), {})) {
+            try {
+                std::cerr << "Moving " << old_save << "\n";
+                bfs::copy_file(
+                               old_save,
+                               icloud_saves_dir / old_save.path().filename(),
+                               // Don't overwrite if exists.
+                               bfs::copy_option::none);
+                bfs::remove(old_save, ec);
+            }
+            catch (const boost::system::system_error &err) {
+                std::cerr << "Not copied\n";
+            }
+        }
+    }
+#endif
+}
+
+void icloud_download_saves()
+{
+	
+}
+
+std::time_t icloud_get_last_date()
+{
+	
+}
+
+std::time_t icloud_get_saves_date()
+{
+	
+}
+
 static void setup_user_data_dir()
 {
 #if defined(__APPLE__) && !defined(__IPHONEOS__)
@@ -633,6 +689,7 @@ static void setup_user_data_dir()
 	create_directory_if_missing(user_data_dir / "persist");
 
 	migrate_1_13_saves();
+	icloud_upload_saves();
 
 #ifdef _WIN32
 	lg::finish_log_file_setup();
