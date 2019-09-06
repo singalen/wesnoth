@@ -292,7 +292,7 @@ bool controller_base::handle_scroll(int mousex, int mousey, int mouse_flags, dou
 	dx += scroll_right_ * scroll_speed;
 
 	// Scroll if mouse is placed near the edge of the screen
-	if(mouse_in_window) {
+	if(mouse_in_window && !last_mouse_is_touch_) {
 		if(mousey < scroll_threshold) {
 			dy -= scroll_speed;
 		}
