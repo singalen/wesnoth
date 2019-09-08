@@ -27,6 +27,7 @@
 #include "gui/widgets/window.hpp"
 
 #include "sdl/rect.hpp"
+#include "sdl/utils.hpp"
 #include "utils/functional.hpp"
 
 namespace gui2
@@ -97,6 +98,11 @@ void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point
 		list.select_row(sel, false);
 	}
 
+	if(sdl_mouse_which == SDL_TOUCH_MOUSEID && touch_scrolled_) {
+		touch_scrolled_ = false;
+		return;
+	}
+
 	SDL_Rect rect = window.get_rectangle();
 	if(!sdl::point_in_rect(coordinate, rect)) {
 		window.set_retval(retval::CANCEL);
@@ -108,6 +114,12 @@ void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point
 void drop_down_menu::mouse_down_callback()
 {
 	mouse_down_happened_ = true;
+	touch_scrolled_ = false;
+}
+
+void drop_down_menu::touch_motion_callback()
+{
+	touch_scrolled_ = true;
 }
 
 void drop_down_menu::pre_show(window& window)
@@ -186,6 +198,9 @@ void drop_down_menu::pre_show(window& window)
 
 	window.connect_signal<event::SDL_LEFT_BUTTON_DOWN>(
 		std::bind(&drop_down_menu::mouse_down_callback, this), event::dispatcher::front_child);
+
+	window.connect_signal<event::SDL_TOUCH_MOTION>(
+		std::bind(&drop_down_menu::touch_motion_callback, this), event::dispatcher::front_pre_child);
 
 	// Handle embedded button toggling.
 	// For some reason this works as a listbox value callback but don't ask me why.
