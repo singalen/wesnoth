@@ -326,3 +326,8 @@ uint32_t get_pixel(const surface& surf, const const_surface_lock& surf_lock, int
 // and a add a colored background
 void draw_centered_on_background(surface surf, const SDL_Rect& rect,
 	const color_t& color, surface target);
+
+// The SDL_MouseButtonEvent.which of the mouse event being processed.
+// We use SDL_GetMouseState() all over the place, but we have no state to query if it's a touch event or not.
+// This is an ad-hoc substitute for SDL_GetMouseWhich().
+extern uint32_t sdl_mouse_which;
