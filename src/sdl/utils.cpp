@@ -30,6 +30,8 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/math/constants/constants.hpp>
 
+uint32_t sdl_mouse_which = 0;
+
 version_info sdl_get_version()
 {
 	SDL_version sdl_version;

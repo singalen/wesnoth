@@ -174,9 +174,7 @@ void controller_base::handle_event(const SDL_Event& event)
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
-		last_mouse_is_touch_ = event.button.which == SDL_TOUCH_MOUSEID;
-
-		if(last_mouse_is_touch_ && long_touch_timer_ == 0) {
+		if(event.button.which == SDL_TOUCH_MOUSEID && long_touch_timer_ == 0) {
 			long_touch_timer_ = gui2::add_timer(
 					long_touch_duration_ms,
 					std::bind(&controller_base::long_touch_callback, this, event.button.x, event.button.y));
@@ -195,8 +193,6 @@ void controller_base::handle_event(const SDL_Event& event)
 			gui2::remove_timer(long_touch_timer_);
 			long_touch_timer_ = 0;
 		}
-
-		last_mouse_is_touch_ = event.button.which == SDL_TOUCH_MOUSEID;
 
 		mh_base.mouse_press(event.button, is_browsing());
 		if(mh_base.get_show_menu()) {
@@ -292,7 +288,7 @@ bool controller_base::handle_scroll(int mousex, int mousey, int mouse_flags, dou
 	dx += scroll_right_ * scroll_speed;
 
 	// Scroll if mouse is placed near the edge of the screen
-	if(mouse_in_window && !last_mouse_is_touch_) {
+	if(mouse_in_window && sdl_mouse_which != SDL_TOUCH_MOUSEID) {
 		if(mousey < scroll_threshold) {
 			dy -= scroll_speed;
 		}

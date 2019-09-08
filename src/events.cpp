@@ -19,6 +19,7 @@
 #include "quit_confirmation.hpp"
 #include "video.hpp"
 #include "sdl/userevent.hpp"
+#include "sdl/utils.hpp"
 
 #if defined _WIN32
 #include "desktop/windows_tray_notification.hpp"
@@ -616,6 +617,7 @@ void pump()
 
 		case SDL_MOUSEBUTTONDOWN: {
 			// Always make sure a cursor is displayed if the mouse moves or if the user clicks
+			sdl_mouse_which = event.button.which;
 			cursor::set_focus(true);
 			if(event.button.button == SDL_BUTTON_LEFT || event.button.which == SDL_TOUCH_MOUSEID) {
 #ifdef __IPHONEOS__
@@ -640,6 +642,11 @@ void pump()
 			}
 			break;
 		}
+		
+		case SDL_FINGERDOWN: /* fall through */
+		case SDL_FINGERUP:
+			sdl_mouse_which = SDL_TOUCH_MOUSEID;
+			break;
 
 		case DRAW_ALL_EVENT: {
 			flip_locker flip_lock(CVideo::get_singleton());
