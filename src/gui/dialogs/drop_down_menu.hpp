@@ -38,6 +38,7 @@ public:
 		, use_markup_(use_markup)
 		, keep_open_(keep_open)
 		, mouse_down_happened_(false)
+		, touch_scrolled_(false)
 		, callback_toggle_state_change_(callback_toggle_state_change)
 	{
 		set_restore(true);
@@ -77,6 +78,11 @@ private:
 	 * This flag prevents that: the menu will only be closed on a mouse-up that follows a mouse-down.
 	 * */
 	bool mouse_down_happened_;
+	
+	/**
+	 * Whether the menu was scrolled by touch-dragging. Then we will ignore the next mouse_up event.
+	 */
+	bool touch_scrolled_;
 
 	/**
 	 * If toggle buttons are used, this callback is called whenever the state of any toggle
@@ -96,6 +102,8 @@ private:
 	void mouse_up_callback(window& window, bool&, bool&, const point& coordinate);
 
 	void mouse_down_callback();
+
+	void touch_motion_callback();
 };
 
 } // namespace dialogs
