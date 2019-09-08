@@ -1266,20 +1266,10 @@ save_result save_image(const surface& surf, const std::string& filename)
 
 bool update_from_preferences()
 {
-	SCALING_ALGORITHM algo = preferences::default_scaling_algorithm;
-	try {
-		algo = SCALING_ALGORITHM::string_to_enum(preferences::get("scale_hex"));
-	} catch(const bad_enum_cast&) {
-	}
-
+	SCALING_ALGORITHM algo = SCALING_ALGORITHM::string_to_enum(preferences::get("scale_hex"), preferences::default_scaling_algorithm);
 	scale_to_hex_func = select_algorithm(algo);
 
-	algo = preferences::default_scaling_algorithm;
-	try {
-		algo = SCALING_ALGORITHM::string_to_enum(preferences::get("scale_zoom"));
-	} catch(const bad_enum_cast&) {
-	}
-
+	algo = SCALING_ALGORITHM::string_to_enum(preferences::get("scale_zoom"), preferences::default_scaling_algorithm);
 	scale_to_zoom_func = select_algorithm(algo);
 
 	return true;
