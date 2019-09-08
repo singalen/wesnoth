@@ -24,6 +24,7 @@
 #include "gui/widgets/window.hpp"
 #include "gui/widgets/text_box_base.hpp"
 #include "sdl/userevent.hpp"
+#include "sdl/utils.hpp"
 
 #include "utils/functional.hpp"
 
@@ -271,6 +272,10 @@ void mouse_motion::signal_handler_show_helptip(const event::ui_event event,
 
 void mouse_motion::mouse_enter(widget* mouse_over)
 {
+	if(sdl_mouse_which == SDL_TOUCH_MOUSEID) {
+		return;
+	}
+
 	DBG_GUI_E << LOG_HEADER << "Firing: " << event::MOUSE_ENTER << ".\n";
 
 	assert(mouse_over);
@@ -284,10 +289,14 @@ void mouse_motion::mouse_enter(widget* mouse_over)
 
 void mouse_motion::mouse_hover(widget* mouse_over, const point& coordinate)
 {
+	if(sdl_mouse_which == SDL_TOUCH_MOUSEID) {
+		return;
+	}
+
 	DBG_GUI_E << LOG_HEADER << "Firing: " << event::MOUSE_MOTION << ".\n";
 
 	assert(mouse_over);
-
+	
 	owner_.fire(event::MOUSE_MOTION, *mouse_over, coordinate);
 
 	if(hover_timer_) {
