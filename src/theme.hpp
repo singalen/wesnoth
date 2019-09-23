@@ -308,6 +308,4 @@ private:
 	object main_map_, mini_map_, unit_image_, palette_;
 
 	border_t border_;
-
-	SDL_Rect screen_dimensions_;
 };
