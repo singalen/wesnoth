@@ -583,7 +583,6 @@ theme::theme(const config& cfg, const SDL_Rect& screen)
 	, unit_image_()
 	, palette_()
 	, border_()
-	, screen_dimensions_(screen)
 {
 	do_resolve_rects(expand_partialresolution(cfg), cfg_);
 	set_resolution(screen);
@@ -613,8 +612,6 @@ theme& theme::operator=(theme&& other)
 
 bool theme::set_resolution(const SDL_Rect& screen)
 {
-	screen_dimensions_ = screen;
-
 	bool result = false;
 
 	int current_rating = 1000000;
@@ -758,10 +755,7 @@ void theme::add_object(const config& cfg)
 		border_ = border_t(c);
 	}
 
-	// Battery charge indicator is always hidden if there isn't enough horizontal space
-	// (GitHub issue #3714)
-	static const int BATTERY_ICON_MIN_WIDTH = 1152;
-	if(!desktop::battery_info::does_device_have_battery() || screen_dimensions_.w < BATTERY_ICON_MIN_WIDTH) {
+	if(!desktop::battery_info::does_device_have_battery()) {
 		if(const config& c = cfg.child("no_battery")) {
 			modify(c);
 		}
