@@ -2755,7 +2755,10 @@ void display::draw_image_for_report(surface& img, SDL_Rect& rect)
 
 		if(visible_area.w > rect.w || visible_area.h > rect.h) {
 			img = get_surface_portion(img,visible_area);
-			img = scale_surface(img,rect.w,rect.h);
+			int half_dx = (rect.w - visible_area.w)/2;
+			int half_dy = (rect.h - visible_area.h)/2;
+			SDL_Rect fragment { -half_dx, -half_dy, rect.w, rect.h };
+			img = cut_surface(img, fragment);
 			visible_area.x = 0;
 			visible_area.y = 0;
 			visible_area.w = img->w;
