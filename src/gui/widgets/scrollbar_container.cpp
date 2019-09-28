@@ -1203,7 +1203,7 @@ scrollbar_container::signal_handler_sdl_touch_motion(const event::ui_event event
 
 	bool is_scrollbar_moved = false;
 
-	if (horizontal_scrollbar_grid_ && horizontal_scrollbar_) {
+	if (horizontal_scrollbar_grid_ && horizontal_scrollbar_ && distance.x != 0) {
 
 		if(horizontal_scrollbar_grid_->get_visible() == widget::visibility::visible) {
 			horizontal_scrollbar_->scroll_by(-distance.x);
@@ -1211,10 +1211,15 @@ scrollbar_container::signal_handler_sdl_touch_motion(const event::ui_event event
 		}
 	}
 
-	if (vertical_scrollbar_grid_ && vertical_scrollbar_) {
+	if (vertical_scrollbar_grid_ && vertical_scrollbar_ && distance.y != 0) {
 
 		if(vertical_scrollbar_grid_->get_visible() == widget::visibility::visible) {
-			vertical_scrollbar_->scroll_by(-distance.y);
+			LOG_GUI_E << LOG_HEADER << event << " moving by: " << distance << ".\n";
+			int move_by = -distance.y / vertical_scrollbar_->get_pixels_per_step();
+			if (move_by == 0) {
+				move_by = distance.y < 0 ? 1 : -1;
+			}
+			vertical_scrollbar_->scroll_by(move_by);
 			is_scrollbar_moved = true;
 		}
 	}
