@@ -49,6 +49,9 @@ void add_builtin_defines(preproc_map& target)
 #if defined(MOUSE_TOUCH_EMULATION) || defined(__IPHONEOS__)
 	target["IPHONEOS"] = preproc_define();
 #endif
+#if defined(MOUSE_TOUCH_EMULATION)
+	target["EMULATION"] = preproc_define();
+#endif
 
 	target["WESNOTH_VERSION"] = preproc_define(game_config::wesnoth_version.str());
 }
