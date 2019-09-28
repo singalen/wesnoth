@@ -511,6 +511,13 @@ void mp_create_game::on_filter_change(window& window, const std::string& id, boo
 	if(do_select) {
 		on_game_select(window);
 	}
+
+	// Test if it's the mobile resolution. No better idea how to see what [resolution] is used.
+	// Worst case, put it under ifdef __IPHONEOS__.
+	const point res = preferences::resolution();
+	if (res.x < 800 || res.y < 600) {
+		window.invalidate_layout();
+	}
 }
 
 void mp_create_game::on_game_select(window& window)
