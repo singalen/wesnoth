@@ -62,11 +62,6 @@ void scrollbar_base::finalize_setup()
 	}
 }
 
-void scrollbar_base::scroll_by(const int pixels)
-{
-	move_positioner(static_cast<int>(pixels_per_step_ * pixels));
-}
-
 void scrollbar_base::scroll(const scroll_mode scroll)
 {
 	switch(scroll) {
@@ -279,8 +274,15 @@ void scrollbar_base::recalculate_positioner()
 	}
 }
 
+void scrollbar_base::scroll_by(const int pixels)
+{
+	// FIXME: Rework. This is not precise enough for a log scrollbars.
+	move_positioner(static_cast<int>(pixels_per_step_ * pixels)); //
+}
+
 void scrollbar_base::move_positioner(const int distance)
 {
+//	LOG_GUI_E << LOG_HEADER << "moving by: " << distance << ".\n";
 	if(distance < 0 && -distance > static_cast<int>(positioner_offset_)) {
 		positioner_offset_ = 0;
 	} else {
