@@ -108,11 +108,19 @@ static std::string resolve_rect(const std::string& rect_str)
 		resolved << "," << rect.y1;
 	}
 	if(items.size() >= 3) {
-		rect.x2 = compute(items[2], ref_rect.x2, rect.x1);
+		if(items[2].compare(0, 2, "w=") == 0) {
+			rect.x2 = rect.x1 + compute(items[2], ref_rect.x2 - ref_rect.x1);
+		} else {
+			rect.x2 = compute(items[2], ref_rect.x2, rect.x1);
+		}
 		resolved << "," << rect.x2;
 	}
 	if(items.size() >= 4) {
-		rect.y2 = compute(items[3], ref_rect.y2, rect.y1);
+		if(items[2].compare(0, 2, "h=") == 0) {
+			rect.y2 = rect.y1 + compute(items[3], ref_rect.y2 - ref_rect.y1);
+		} else {
+			rect.y2 = compute(items[3], ref_rect.y2, rect.y1);
+		}
 		resolved << "," << rect.y2;
 	}
 
@@ -406,9 +414,18 @@ void theme::object::modify_location(std::string rect_str, SDL_Rect location_ref_
 	}
 	if(items.size() >= 3) {
 		rect.x2 = compute(items[2], location_ref_rect.x + location_ref_rect.w, rect.x1);
+		if(items[2].compare(0, 2, "w=") == 0) {
+			rect.x2 = rect.x1 + compute(items[2], location_ref_rect.w);
+		} else {
+			rect.x2 = compute(items[2], location_ref_rect.x + location_ref_rect.w, rect.x1);
+		}
 	}
 	if(items.size() >= 4) {
-		rect.y2 = compute(items[3], location_ref_rect.y + location_ref_rect.h, rect.y1);
+		if(items[2].compare(0, 2, "h=") == 0) {
+			rect.y2 = rect.y1 + compute(items[3], ref_rect.y2 - ref_rect.y1);
+		} else {
+			rect.y2 = compute(items[3], location_ref_rect.y + location_ref_rect.h, rect.y1);
+		}
 	}
 	modify_location(rect);
 }
