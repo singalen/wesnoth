@@ -375,9 +375,15 @@ void help_text_area::add_text_item(const std::string& text, const std::string& r
 void help_text_area::add_img_item(const std::string& path, const std::string& alignment,
 								  const bool floating, const bool box)
 {
+	bool tiny_gui = width() < 400;
 	surface surf(image::get_image(path));
 	if (surf.null())
 		return;
+
+	if(tiny_gui && (surf->w >= 300)) {
+		surf = scale_surface(surf, surf->w / 2, surf->h / 2);
+	}
+	
 	ALIGNMENT align = str_to_align(alignment);
 	if (align == HERE && floating) {
 		WRN_DP << "Floating image with align HERE, aligning left." << std::endl;
