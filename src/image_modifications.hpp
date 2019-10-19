@@ -607,4 +607,14 @@ private:
 	channel alpha_;
 };
 
+/**
+ * Channel swap (SWAP).
+ */
+class crop_transparent_modification : public modification
+{
+public:
+	crop_transparent_modification() {}
+	virtual surface operator()(const surface& src) const;
+};
+
 } /* end namespace image */
