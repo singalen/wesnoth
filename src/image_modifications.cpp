@@ -599,6 +599,21 @@ surface swap_modification::operator()(const surface &src) const
 	return swap_channels_image(src, red_, green_, blue_, alpha_);
 }
 
+surface crop_transparent_modification::operator()(const surface& src) const
+{
+	SDL_Rect visible_area = get_non_transparent_portion(src);
+
+	if(visible_area.x != 0 || visible_area.y != 0 || visible_area.w != src->w || visible_area.h != src->h) {
+		if(visible_area.w == 0 || visible_area.h == 0) {
+			return src;
+		}
+
+		return get_surface_portion(src, visible_area);
+	}
+	
+	return src;
+}
+
 namespace {
 
 struct parse_mod_registration
@@ -1337,6 +1352,11 @@ REGISTER_MOD_PARSER(SWAP, args)
 	}
 
 	return new swap_modification(redValue, greenValue, blueValue, alphaValue);
+}
+
+REGISTER_MOD_PARSER(CROP_TRANSPARENT, )
+{
+	return new crop_transparent_modification();
 }
 
 } // end anon namespace
