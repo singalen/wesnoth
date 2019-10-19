@@ -302,7 +302,7 @@ void parser::parse_variable()
 			break;
 
 		default:
-			error(_("Unexpected characters after variable name (expected , or =)"));
+			error(_("Unexpected characters after variable name (expected , or =)") + ": " + tok_.current_token().value);
 			break;
 		}
 
