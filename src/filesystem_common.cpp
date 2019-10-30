@@ -22,6 +22,13 @@
 #include "serialization/string_utils.hpp"
 #include "serialization/unicode.hpp"
 
+#ifdef __IPHONEOS__
+#include <cstdlib>
+#include <SDL_error.h>
+
+#include "ios/ios_filesystem.h"
+#endif
+
 static lg::log_domain log_filesystem("filesystem");
 #define LOG_FS LOG_STREAM(info, log_filesystem)
 #define ERR_FS LOG_STREAM(err, log_filesystem)
@@ -63,10 +70,27 @@ std::string get_save_index_file()
 	return get_user_data_dir() + "/save_index";
 }
 
+static std::string user_saves_dir;
+
 std::string get_saves_dir()
 {
-	const std::string dir_path = get_user_data_dir() + "/saves";
-	return get_dir(dir_path);
+	if(!user_saves_dir.empty()) {
+		return user_saves_dir;
+	}
+
+#ifndef __IPHONEOS__
+	user_saves_dir = get_user_data_dir() + "/saves";
+#else
+	char *ICloudDocumentsPath = Wesnoth_GetICloudDocumentsPath();
+	if(ICloudDocumentsPath) {
+		user_saves_dir = ICloudDocumentsPath;
+		user_saves_dir += "/saves";
+        std::free(ICloudDocumentsPath);
+	} else {
+		SDL_OutOfMemory();
+	}
+#endif
+	return get_dir(user_saves_dir);
 }
 
 std::string get_addons_dir()
