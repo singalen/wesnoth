@@ -152,6 +152,9 @@ void preferences_dialog::set_resolution_list(menu_button& res_list, CVideo& vide
 	resolutions_ = video.get_available_resolutions(true);
 #define IPHONE_TEST
 #ifdef IPHONE_TEST
+	resolutions_.insert(resolutions_.begin(), point(812, 375));
+	resolutions_.insert(resolutions_.begin(), point(896, 414));
+	resolutions_.insert(resolutions_.begin(), point(736, 414));
 	resolutions_.insert(resolutions_.begin(), point(667, 375));
 	resolutions_.insert(resolutions_.begin(), point(568, 320));
 #endif
