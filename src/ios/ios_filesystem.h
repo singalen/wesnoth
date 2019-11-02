@@ -19,11 +19,10 @@
 extern "C" {
 #endif
 
-char *Wesnoth_GetDocumentsPath(const char *org, const char *app);
+char *Wesnoth_GetICloudDocumentsPath();
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* ios_filesystem_h */
