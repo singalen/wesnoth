@@ -107,6 +107,10 @@ scrollbar_container::scrollbar_container(
 						_5,
 						_6),
 			event::dispatcher::back_post_child);
+
+	connect_signal<event::SDL_TOUCH_UP>(
+		std::bind(&scrollbar_container::signal_handler_sdl_touch_up, this, _2, _3),
+		event::dispatcher::back_post_child);
 }
 
 void scrollbar_container::layout_initialize(const bool full_initialization)
@@ -1204,7 +1208,6 @@ scrollbar_container::signal_handler_sdl_touch_motion(const event::ui_event event
 	bool is_scrollbar_moved = false;
 
 	if (horizontal_scrollbar_grid_ && horizontal_scrollbar_ && distance.x != 0) {
-
 		if(horizontal_scrollbar_grid_->get_visible() == widget::visibility::visible) {
 			horizontal_scrollbar_->scroll_by(-distance.x);
 			is_scrollbar_moved = true;
@@ -1212,14 +1215,8 @@ scrollbar_container::signal_handler_sdl_touch_motion(const event::ui_event event
 	}
 
 	if (vertical_scrollbar_grid_ && vertical_scrollbar_ && distance.y != 0) {
-
 		if(vertical_scrollbar_grid_->get_visible() == widget::visibility::visible) {
-			LOG_GUI_E << LOG_HEADER << event << " moving by: " << distance << ".\n";
-			int move_by = -distance.y / vertical_scrollbar_->get_pixels_per_step();
-			if (move_by == 0) {
-				move_by = distance.y < 0 ? 1 : -1;
-			}
-			vertical_scrollbar_->scroll_by(move_by);
+			vertical_scrollbar_->scroll_by(-distance.y);
 			is_scrollbar_moved = true;
 		}
 	}
@@ -1230,6 +1227,24 @@ scrollbar_container::signal_handler_sdl_touch_motion(const event::ui_event event
 	}
 }
 
+void scrollbar_container::signal_handler_sdl_touch_up(const event::ui_event event, bool& handled)
+{
+	DBG_GUI_E << LOG_HEADER << event << ".\n";
+
+	if (horizontal_scrollbar_grid_ && horizontal_scrollbar_) {
+		if(horizontal_scrollbar_grid_->get_visible() == widget::visibility::visible) {
+			horizontal_scrollbar_->end_scrolling();
+			handled = true;
+		}
+	}
+
+	if (vertical_scrollbar_grid_ && vertical_scrollbar_) {
+		if(vertical_scrollbar_grid_->get_visible() == widget::visibility::visible) {
+			vertical_scrollbar_->end_scrolling();
+			handled = true;
+		}
+	}
+}
 
 
 } // namespace gui2

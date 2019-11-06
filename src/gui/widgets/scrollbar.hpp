@@ -73,6 +73,8 @@ public:
 	void scroll(const scroll_mode scroll);
 
 	void scroll_by(const int pixels);
+	
+	void end_scrolling();
 
 	/** Is the positioner at the beginning of the scrollbar? */
 	bool at_begin() const
@@ -254,6 +256,12 @@ private:
 	 * step.
 	 */
 	float pixels_per_step_;
+	
+	/**
+	 * The remainder of pixels to move by, if we cannot move_by(pixels) at once 
+	 * (because pixels_per_step_ can be too small) 
+	 * */
+	int accumulated_movement_;
 
 	/**
 	 * The position the mouse was at the last movement.
