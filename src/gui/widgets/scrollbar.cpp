@@ -35,6 +35,7 @@ scrollbar_base::scrollbar_base(const implementation::builder_styled_widget& buil
 	, visible_items_(1)
 	, step_size_(1)
 	, pixels_per_step_(0.0)
+	, accumulated_movement_(0)
 	, mouse_(0, 0)
 	, positioner_offset_(0)
 	, positioner_length_(0)
@@ -276,8 +277,18 @@ void scrollbar_base::recalculate_positioner()
 
 void scrollbar_base::scroll_by(const int pixels)
 {
-	// FIXME: Rework. This is not precise enough for a log scrollbars.
-	move_positioner(static_cast<int>(pixels_per_step_ * pixels)); //
+	accumulated_movement_ += pixels;
+	
+	auto move_by = static_cast<int>(pixels_per_step_ * accumulated_movement_);
+	if(move_by) {
+		move_positioner(move_by);
+		accumulated_movement_ -= static_cast<int>(move_by / pixels_per_step_);
+	}
+}
+
+void scrollbar_base::end_scrolling()
+{
+	accumulated_movement_ = 0;
 }
 
 void scrollbar_base::move_positioner(const int distance)
