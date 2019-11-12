@@ -85,9 +85,9 @@ std::string get_saves_dir()
 	if(ICloudDocumentsPath) {
 		user_saves_dir = ICloudDocumentsPath;
 		user_saves_dir += "/saves";
-        std::free(ICloudDocumentsPath);
+		std::free(ICloudDocumentsPath);
 	} else {
-		SDL_OutOfMemory();
+		user_saves_dir = get_user_data_dir() + "/saves";
 	}
 #endif
 	return get_dir(user_saves_dir);
