@@ -619,7 +619,12 @@ static void migrate_1_13_saves()
 static void migrate_icloud_saves()
 {
 #ifdef __IPHONEOS__
-	boost::filesystem::path current_saves_dir = Wesnoth_GetICloudDocumentsPath();
+	const char *icloud_path = Wesnoth_GetICloudDocumentsPath();
+	if(!icloud_path) {
+		return;
+	}
+
+	boost::filesystem::path current_saves_dir = get_saves_dir();
 	boost::filesystem::path old_saves_dir = user_data_dir / "saves";
 
 	std::cerr << "Copying files from " << old_saves_dir << " to " << current_saves_dir << "\n";
