@@ -1161,6 +1161,7 @@ namespace { // Private helpers for move_unit()
 			message_prefix += " \n";
 		}
 
+#ifndef __IPHONEOS__
 		// Suggest "continue move"?
 		if ( playing_team_is_viewing_ && sighted_stop_ && !resources::whiteboard->is_executing_actions() ) {
 			// See if the "Continue Move" action has an associated hotkey
@@ -1173,6 +1174,7 @@ namespace { // Private helpers for move_unit()
 				message_prefix += " \n";
 			}
 		}
+#endif
 	}
 
 }//end anonymous namespace
