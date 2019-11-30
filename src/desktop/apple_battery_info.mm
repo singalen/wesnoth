@@ -84,6 +84,7 @@ inline NSDictionary* get_iops_battery_info() {
 
 double get_battery_percentage() {
 #if defined(__IPHONEOS__)
+	UIDevice.currentDevice.batteryMonitoringEnabled = true;
     return UIDevice.currentDevice.batteryLevel * 100;
 #else
     //Code taken from https://github.com/Hammerspoon/hammerspoon/blob/master/extensions/battery/internal.m
