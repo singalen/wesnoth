@@ -42,68 +42,25 @@ static size_t next_timer_id = 0;
 /** The active timers. */
 static std::map<size_t, timer>& get_timers()
 {
-	static std::map<size_t, timer>* ptimers = new std::map<size_t, timer>();
+	static auto* ptimers = new std::map<size_t, timer>();
 	return *ptimers;
 }
-/**
-	The id of the event being executed, 0 if none.
-	NOTE: it is possible that multiple timers are executed at the same time
-	      if one of the timer starts an event loop for example if its handler
-		  shows a dialog. In that case code that relies on this breaks. This
-		  could probably fixed my making this a list/stack of ids.
-*/
-static size_t executing_id = 0;
 
 std::mutex timers_mutex;
-
-/** Did somebody try to remove the timer during its execution? */
-static bool executing_id_removed = false;
-
-/**
- * Helper to make removing a timer in a callback safe.
- *
- * Upon creation it sets the executing id and clears the remove request flag.
- *
- * If an remove_timer() is called for the id being executed it requests a
- * remove the timer and exits remove_timer().
- *
- * Upon destruction it tests whether there was a request to remove the id and
- * does so. It also clears the executing id. It leaves the remove request flag
- * since the execution function needs to know whether or not the event was
- * removed.
- */
-class executor
-{
-public:
-	executor(size_t id)
-	{
-		executing_id = id;
-		executing_id_removed = false;
-	}
-
-	~executor()
-	{
-		const size_t id = executing_id;
-		executing_id = 0;
-		if(executing_id_removed) {
-			remove_timer(id);
-		}
-	}
-};
 
 extern "C" {
 
 static uint32_t timer_callback(uint32_t, void* id)
 {
 	DBG_GUI_E << "Pushing timer event in queue.\n";
-	// iTunes still reports a couple of crashes here. Cannot see a problem yet.
 
 	Uint32 result;
 	{
+		// iTunes still reports a couple of std::system_error-s here. Cannot see a problem yet.
+		// They happen in SDL_TimerThread, so it's hardly a double-lock?..
 		std::lock_guard<std::mutex> lock(timers_mutex);
 
-		std::map<size_t, timer>::iterator itor
-				= get_timers().find(reinterpret_cast<size_t>(id));
+		auto itor = get_timers().find(reinterpret_cast<size_t>(id));
 		if(itor == get_timers().end()) {
 			return 0;
 		}
@@ -171,15 +128,10 @@ bool remove_timer(const size_t id)
 
 	std::lock_guard<std::mutex> lock(timers_mutex);
 
-	std::map<size_t, timer>::iterator itor = get_timers().find(id);
+	auto itor = get_timers().find(id);
 	if(itor == get_timers().end()) {
 		LOG_GUI_E << "Can't remove timer since it no longer exists.\n";
 		return false;
-	}
-
-	if(id == executing_id) {
-		executing_id_removed = true;
-		return true;
 	}
 
 	if(!SDL_RemoveTimer(itor->second.sdl_id)) {
@@ -206,7 +158,7 @@ bool execute_timer(const size_t id)
 	{
 		std::lock_guard<std::mutex> lock(timers_mutex);
 
-		std::map<size_t, timer>::iterator itor = get_timers().find(id);
+		auto itor = get_timers().find(id);
 		if(itor == get_timers().end()) {
 			LOG_GUI_E << "Can't execute timer since it no longer exists.\n";
 			return false;
