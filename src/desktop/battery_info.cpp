@@ -29,8 +29,12 @@
 namespace desktop {
 namespace battery_info {
 
+#define MOUSE_TOUCH_EMULATION
 bool does_device_have_battery()
 {
+#if defined(MOUSE_TOUCH_EMULATION) && !defined(__IPHONEOS__)
+	return true;
+#else
 #if defined(_WIN32)
 	return windows_battery_info::does_device_have_battery();
 #elif defined(__APPLE__)
@@ -40,12 +44,19 @@ bool does_device_have_battery()
 #else
 	return false;
 #endif
+#endif
 }
 
 double get_battery_percentage()
 {
 #if defined(_WIN32)
-	return windows_battery_info::get_battery_percentage();
+	double result = windows_battery_info::get_battery_percentage();
+#if defined(MOUSE_TOUCH_EMULATION)
+	if (result < 1.0) {
+		result = 100;
+	}
+#endif
+	return result;
 #elif defined(__APPLE__)
 	return desktop::battery_info::apple::get_battery_percentage();
 #elif defined(HAVE_LIBDBUS)
