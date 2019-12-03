@@ -54,9 +54,18 @@ std::map<std::string, device_info> devices = {
     { "iPhone10,5",  { .name="iPhone 8 Plus (GSM)", .screen_dpi=401, .screen_width_px=1242, .screen_height_px=2208, .screen_scale=3 } },
     { "iPhone10,3",  { .name="iPhone X (CDMA)", .screen_dpi=458, .screen_width_px=1125, .screen_height_px=2436, .screen_scale=3 } },
     { "iPhone10,6",  { .name="iPhone X (GSM)", .screen_dpi=458, .screen_width_px=1125, .screen_height_px=2436, .screen_scale=3 } },
-    { "iPhone11,2",  { .name="iPhone XS", .screen_dpi=458, .screen_width_px=1125, .screen_height_px=2436, .screen_scale=3 } },
+
+    { "iPhone11,1",  { .name="iPhone XR (GSM+CDMA)", .screen_dpi=326, .screen_width_px=828, .screen_height_px=1792, .screen_scale=2 } },
+    { "iPhone11,2",  { .name="iPhone XS (GSM+CDMA)", .screen_dpi=458, .screen_width_px=1125, .screen_height_px=2436, .screen_scale=3 } },
+    { "iPhone11,3",  { .name="iPhone XS (GSM)", .screen_dpi=458, .screen_width_px=1125, .screen_height_px=2436, .screen_scale=3 } },
+    { "iPhone11,4",  { .name="iPhone XS Max (GSM+CDMA)", .screen_dpi=458, .screen_width_px=1242, .screen_height_px=2688, .screen_scale=3 } },
+    { "iPhone11,5",  { .name="iPhone XS Max (GSM, Dual Sim, China)", .screen_dpi=458, .screen_width_px=1242, .screen_height_px=2688, .screen_scale=3 } },
     { "iPhone11,6",  { .name="iPhone XS Max", .screen_dpi=458, .screen_width_px=1242, .screen_height_px=2688, .screen_scale=3 } },
-    { "iPhone11,8",  { .name="iPhone XR", .screen_dpi=326, .screen_width_px=828, .screen_height_px=1792, .screen_scale=2 } },
+    { "iPhone11,8",  { .name="iPhone XR (GSM)", .screen_dpi=326, .screen_width_px=828, .screen_height_px=1792, .screen_scale=2 } },
+
+    { "iPhone12,1",  { .name="iPhone 11", .screen_dpi=326, .screen_width_px=828, .screen_height_px=1792, .screen_scale=2 } },
+    { "iPhone12,2",  { .name="iPhone 11 Pro", .screen_dpi=458, .screen_width_px=1125, .screen_height_px=2436, .screen_scale=3 } },
+    { "iPhone12,3",  { .name="iPhone 11 Pro Max", .screen_dpi=458, .screen_width_px=1242, .screen_height_px=2688, .screen_scale=3 } },
     
     { "iPod1,1",  { .name="1st Gen iPod", .screen_dpi=163, .screen_width_px=320, .screen_height_px=480, .screen_scale=1 } },
     { "iPod2,1",  { .name="2nd Gen iPod", .screen_dpi=163, .screen_width_px=320, .screen_height_px=480, .screen_scale=1 } },
