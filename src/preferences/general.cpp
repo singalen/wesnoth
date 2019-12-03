@@ -377,10 +377,14 @@ void set_scroll_to_action(bool ison)
 point resolution()
 {
 #if defined(__IPHONEOS__)
-	const int w = iOS_device_info::get_device_screen_height_pt();
-	const int h = iOS_device_info::get_device_screen_width_pt();
+//	const int w = iOS_device_info::get_device_screen_height_pt();
+//	const int h = iOS_device_info::get_device_screen_width_pt();
 
-	return point(w, h);
+	SDL_DisplayMode DM;
+	DM.driverdata = nullptr;
+	SDL_GetCurrentDisplayMode(0, &DM);
+
+	return point(DM.w, DM.h);
 #else
 	const unsigned x_res = prefs["xresolution"].to_unsigned();
 	const unsigned y_res = prefs["yresolution"].to_unsigned();
