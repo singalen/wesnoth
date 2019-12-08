@@ -265,6 +265,8 @@ public:
 		return text_alignment_;
 	}
 
+	void set_text_maximum_width(int text_maximum_width);
+
 	void set_text_ellipse_mode(const PangoEllipsizeMode ellipse_mode);
 
 	/**
@@ -519,6 +521,7 @@ public:
 	t_string help;
 	bool use_tooltip_on_label_overflow;
 	bool use_markup;
+	int text_maximum_width;
 };
 
 } // namespace implementation
