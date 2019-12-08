@@ -56,7 +56,7 @@ styled_widget::styled_widget(const implementation::builder_styled_widget& builde
 	, config_(get_control(control_type, definition_))
 	, canvases_(config_->state.size()) // One canvas per state
 	, renderer_()
-	, text_maximum_width_(0)
+	, text_maximum_width_(builder.text_maximum_width)
 	, text_alignment_(PANGO_ALIGN_LEFT)
 	, text_ellipse_mode_(PANGO_ELLIPSIZE_END)
 	, shrunken_(false)
@@ -124,6 +124,11 @@ void styled_widget::set_members(const string_map& data)
 	itor = data.find("text_alignment");
 	if(itor != data.end()) {
 		set_text_alignment(decode_text_alignment(itor->second));
+	}
+
+	itor = data.find("text_maximum_width");
+	if(itor != data.end()) {
+		set_text_maximum_width(std::stoi(itor->second));
 	}
 }
 
@@ -351,6 +356,16 @@ void styled_widget::set_text_alignment(const PangoAlignment text_alignment)
 
 	text_alignment_ = text_alignment;
 	update_canvas();
+	set_is_dirty(true);
+}
+
+void styled_widget::set_text_maximum_width(int text_maximum_width)
+{
+	if(text_maximum_width_ == text_maximum_width) {
+		return;
+	}
+
+	text_maximum_width_ = text_maximum_width;
 	set_is_dirty(true);
 }
 
@@ -657,6 +672,7 @@ builder_styled_widget::builder_styled_widget(const config& cfg)
 	, help(cfg["help"].t_str())
 	, use_tooltip_on_label_overflow(true)
 	, use_markup(cfg["use_markup"].to_bool(false))
+	, text_maximum_width(cfg["text_maximum_width"])
 {
 	if(definition.empty()) {
 		definition = "default";
