@@ -629,6 +629,10 @@ static void migrate_icloud_saves()
 
 	boost::filesystem::path current_saves_dir = get_saves_dir();
 	boost::filesystem::path old_saves_dir = user_data_dir / "saves";
+    
+    if(!bfs::exists(old_saves_dir)) {
+        return;
+    }
 
 	std::cerr << "Copying files from " << old_saves_dir << " to " << current_saves_dir << "\n";
 	error_code ec;
