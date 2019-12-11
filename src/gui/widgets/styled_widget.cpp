@@ -201,11 +201,14 @@ void styled_widget::request_reduce_width(const unsigned maximum_width)
 {
 	assert(config_);
 
+	point size;
+	if(!label_.empty()) {
+		// Also calling in hope to get the side effect of updating text renderer.
+		size = get_best_text_size(
+			point(), point(maximum_width - config_->text_extra_width, 0));
+	}
+
 	if(!label_.empty() && can_wrap()) {
-
-		point size = get_best_text_size(
-				point(), point(maximum_width - config_->text_extra_width, 0));
-
 		size.x += config_->text_extra_width;
 		size.y += config_->text_extra_height;
 
@@ -454,9 +457,9 @@ point styled_widget::get_best_text_size(point minimum_size, point maximum_size) 
 	assert(!label_.empty());
 
 	// Try with the minimum wanted size.
-	const int maximum_width = text_maximum_width_ != 0
-		? text_maximum_width_
-		: maximum_size.x;
+	if(text_maximum_width_ != 0) {
+		maximum_size.x = text_maximum_width_;
+	}
 
 	/*
 	 * NOTE: text rendering does *not* happen here. That happens in the text_shape
@@ -470,7 +473,7 @@ point styled_widget::get_best_text_size(point minimum_size, point maximum_size) 
 		.set_font_size(config_->text_font_size)
 		.set_font_style(config_->text_font_style)
 		.set_alignment(text_alignment_)
-		.set_maximum_width(maximum_width)
+		.set_maximum_width(maximum_size.x)
 		.set_ellipse_mode(get_text_ellipse_mode())
 		.set_characters_per_line(get_characters_per_line())
 		.set_text(label_, use_markup_);
