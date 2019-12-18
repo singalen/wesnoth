@@ -31,6 +31,7 @@
 #include "game_version.hpp"
 #include "wesconfig.h"
 #include "deprecation.hpp"
+#include "gui/widgets/settings.hpp"
 
 #include <stdexcept>
 #include <deque>
@@ -1311,6 +1312,20 @@ bool preprocessor_data::get_chunk()
 			DBG_PREPROC << "testing for file or directory " << symbol << ": " << (found ? "found" : "not found")
 						<< '\n';
 			conditional_skip(found);
+		} else if(command == "ifscreenhigher") {
+			skip_spaces();
+			const std::string& symbol = read_word();
+			bool higher = gui2::settings::screen_height > std::strtol(symbol.c_str(), nullptr, 10);
+			DBG_PREPROC << "if screen is higher than " << symbol << ": " << (higher ? "yes" : "no")
+						<< '\n';
+			conditional_skip(!higher);
+		} else if(command == "ifscreenwider") {
+			skip_spaces();
+			const std::string& symbol = read_word();
+			bool wider = gui2::settings::screen_width > std::strtol(symbol.c_str(), nullptr, 10);
+			DBG_PREPROC << "if screen is wider than " << symbol << ": " << (wider ? "yes" : "no")
+						<< '\n';
+			conditional_skip(!wider);
 		} else if(command == "ifver" || command == "ifnver") {
 			skip_spaces();
 			const std::string& vsymstr = read_word();
