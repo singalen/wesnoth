@@ -222,6 +222,9 @@ void mouse_motion::signal_handler_sdl_touch_motion(const event::ui_event event,
 	} else {
 		widget* mouse_over = owner_.find_at(coordinate, true);
 		if(mouse_over) {
+			// All touch events are always captured. Whatever you start dragging, you continue dragging.
+			mouse_focus_ = mouse_over;
+			capture_mouse();
 			owner_.fire(event, *mouse_over, coordinate, distance);
 		}
 	}
@@ -456,7 +459,7 @@ void mouse_button<T>::signal_handler_sdl_button_down(const event::ui_event event
 	}
 	is_down_ = true;
 
-	if(mouse_captured_) {
+	if(mouse_captured_ && sdl_mouse_which != SDL_TOUCH_MOUSEID) {
 		assert(mouse_focus_);
 		focus_ = mouse_focus_;
 		DBG_GUI_E << LOG_HEADER << "Firing: " << T::sdl_button_down_event << ".\n";
@@ -476,6 +479,7 @@ void mouse_button<T>::signal_handler_sdl_button_down(const event::ui_event event
 					  << "and mouse not captured, we missed events.\n";
 #endif
 			mouse_focus_ = mouse_over;
+			mouse_captured_ = false;
 		}
 
 		focus_ = mouse_over;
