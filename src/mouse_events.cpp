@@ -50,6 +50,10 @@
 #include <ostream>     // for operator<<, basic_ostream, etc
 #include <string>      // for string, operator<<, etc
 
+#if defined(__IPHONEOS__)
+#include <ios/iOS_device_info.hpp>
+#endif
+
 static lg::log_domain log_engine("engine");
 #define ERR_NG LOG_STREAM(err, log_engine)
 #define LOG_NG LOG_STREAM(info, log_engine)
@@ -90,8 +94,23 @@ void mouse_handler::set_side(int side_number)
 
 int mouse_handler::drag_threshold() const
 {
-	// TODO: Use physical screen size.
+#if defined(__IPHONEOS__)
+	static int threshold = -1;
+	if(threshold < 0)
+	{
+		const int ddpi = iOS_device_info::get_device_screen_dpi();
+
+		if(ddpi <= 132) threshold = 14;
+		else if(ddpi <= 164) threshold = 18;
+		else if(ddpi <= 264) threshold = 28;
+		else if(ddpi <= 330) threshold = 36;
+		else if(ddpi > 400) threshold = 36;
+		else threshold = 14;
+	}
+	return threshold;
+#else
 	return 14;
+#endif
 }
 
 void mouse_handler::touch_motion(int x, int y, const bool browse, bool update, map_location new_hex)

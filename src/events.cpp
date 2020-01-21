@@ -670,6 +670,7 @@ void pump()
 			sdl_mouse_which = event.button.which;
 			cursor::set_focus(true);
 			if(event.button.button == SDL_BUTTON_LEFT || event.button.which == SDL_TOUCH_MOUSEID) {
+				// TODO: Use actual DPI
 #ifdef __IPHONEOS__
 				static const int DoubleClickTime = 200;
 				static const int DoubleClickMaxMove = 15;
