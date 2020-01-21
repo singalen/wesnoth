@@ -62,6 +62,11 @@ namespace
 
 void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point& coordinate)
 {
+	if(sdl_mouse_which == SDL_TOUCH_MOUSEID && touch_scrolled_) {
+		touch_scrolled_ = false;
+		return;
+	}
+
 	if(!mouse_down_happened_) {
 		return;
 	}
@@ -96,11 +101,6 @@ void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point
 	const int sel = list.get_selected_row();
 	if(sel >= 0) {
 		list.select_row(sel, false);
-	}
-
-	if(sdl_mouse_which == SDL_TOUCH_MOUSEID && touch_scrolled_) {
-		touch_scrolled_ = false;
-		return;
 	}
 
 	SDL_Rect rect = window.get_rectangle();
