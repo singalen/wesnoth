@@ -37,13 +37,13 @@ public:
 		, selected_item_(selected_item)
 		, use_markup_(use_markup)
 		, keep_open_(keep_open)
-		, mouse_down_happened_(false)
+		, just_opened_(true)
 		, touch_scrolled_(false)
 		, callback_toggle_state_change_(callback_toggle_state_change)
 	{
 		set_restore(true);
 	}
-
+	
 	int selected_item() const
 	{
 		return selected_item_;
@@ -77,7 +77,7 @@ private:
 	 * When menu is invoked on a long-touch timer, a following mouse-up event will close it.
 	 * This flag prevents that: the menu will only be closed on a mouse-up that follows a mouse-down.
 	 * */
-	bool mouse_down_happened_;
+	bool just_opened_;
 	
 	/**
 	 * Whether the menu was scrolled by touch-dragging. Then we will ignore the next mouse_up event.
@@ -103,7 +103,7 @@ private:
 
 	void mouse_down_callback();
 
-	void touch_motion_callback();
+	void touch_motion_callback(const point& distance);
 };
 
 } // namespace dialogs

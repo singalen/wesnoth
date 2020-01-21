@@ -62,11 +62,12 @@ namespace
 
 void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point& coordinate)
 {
-	if(!mouse_down_happened_) {
-		return;
-	}
-
 	listbox& list = find_widget<listbox>(&window, "list", true);
+	bool was_touch_scrolled = touch_scrolled_;
+	bool was_just_opened = just_opened_;
+	// mouse-up means we're already done with the initial touch and with scrolling.
+	touch_scrolled_ = false;
+	just_opened_ = false;
 
 	/* Disregard clicks on scrollbars and toggle buttons so the dropdown menu can be scrolled or have an embedded
 	 * toggle button selected without the menu closing.
@@ -79,10 +80,12 @@ void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point
 	 * vanish.
 	 */
 	if(list.vertical_scrollbar()->get_state() == scrollbar_base::PRESSED) {
+		std::cout << "Cancelling mouse-up b/c scrollbar\n";
 		return;
 	}
 
 	if(dynamic_cast<toggle_button*>(window.find_at(coordinate, true)) != nullptr) {
+		std::cout << "Cancelling mouse-up b/c toggle\n";
 		return;
 	}
 
@@ -98,8 +101,14 @@ void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point
 		list.select_row(sel, false);
 	}
 
-	if(sdl_mouse_which == SDL_TOUCH_MOUSEID && touch_scrolled_) {
-		touch_scrolled_ = false;
+	// These returns need to happen after the list.select_row(sel, false), above, otherwise we will crash.
+	if(was_just_opened) {
+		std::cout << "Cancelling mouse-up b/c menu was just opened\n";
+		return;
+	}
+
+	if(sdl_mouse_which == SDL_TOUCH_MOUSEID && was_touch_scrolled) {
+		std::cout << "Cancelling mouse-up b/c menu was scrolled\n";
 		return;
 	}
 
@@ -113,13 +122,18 @@ void drop_down_menu::mouse_up_callback(window& window, bool&, bool&, const point
 
 void drop_down_menu::mouse_down_callback()
 {
-	mouse_down_happened_ = true;
+	// The danger here is if for some reason we don't receive SDL_LEFT_BUTTON_DOWN, the menu will be unclickable.
+	just_opened_ = false;
 	touch_scrolled_ = false;
 }
 
-void drop_down_menu::touch_motion_callback()
+void drop_down_menu::touch_motion_callback(const point& distance)
 {
-	touch_scrolled_ = true;
+	// Danger here is if we don't scroll far enough. we will again make the menu unclickable (this time).
+	// And it indeed happened! This 10 is a wild guess, which kinda worked.
+	if(std::abs(distance.y) > 10) {
+		touch_scrolled_ = true;
+	}
 }
 
 void drop_down_menu::pre_show(window& window)
@@ -200,7 +214,7 @@ void drop_down_menu::pre_show(window& window)
 		std::bind(&drop_down_menu::mouse_down_callback, this), event::dispatcher::front_child);
 
 	window.connect_signal<event::SDL_TOUCH_MOTION>(
-		std::bind(&drop_down_menu::touch_motion_callback, this), event::dispatcher::front_pre_child);
+		std::bind(&drop_down_menu::touch_motion_callback, this, _6), event::dispatcher::front_pre_child);
 
 	// Handle embedded button toggling.
 	// For some reason this works as a listbox value callback but don't ask me why.
