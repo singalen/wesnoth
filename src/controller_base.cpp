@@ -44,7 +44,6 @@ controller_base::controller_base()
 	, scroll_right_(false)
 	, joystick_manager_()
 	, key_release_listener_(*this)
-	, last_mouse_is_touch_(false)
 	, long_touch_timer_(0)
 {
 }
@@ -64,6 +63,7 @@ void controller_base::long_touch_callback(int x, int y)
 		int y_now;
 		uint32_t mouse_state = SDL_GetMouseState(&x_now, &y_now);
 
+#define MOUSE_TOUCH_EMULATION
 #ifdef MOUSE_TOUCH_EMULATION
 		if(mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
 			// Monkey-patch touch controls again to make them look like left button.
