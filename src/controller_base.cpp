@@ -44,7 +44,6 @@ controller_base::controller_base()
 	, scroll_right_(false)
 	, joystick_manager_()
 	, key_release_listener_(*this)
-	, last_mouse_is_touch_(false)
 	, long_touch_timer_(0)
 {
 }
