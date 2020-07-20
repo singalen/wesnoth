@@ -21,6 +21,7 @@
 #include "log.hpp"
 #include "preferences/general.hpp"
 #include "sdl/point.hpp"
+#include "sdl/touch_device.hpp"
 #include "sdl/userevent.hpp"
 #include "sdl/utils.hpp"
 #include "sdl/window.hpp"
@@ -615,4 +616,11 @@ void CVideo::lock_flips(bool lock)
 	} else {
 		--flip_locked_;
 	}
+}
+
+const sdl::touch_device& CVideo::get_touch_device(SDL_TouchID ) const
+{
+	// TODO: Temporary hack for iOS. We'll need to implement it some day for touchscreens,
+	// touchpads and external touchpads, including ones connected to iOS.
+	return sdl::dummy_touch_device;
 }

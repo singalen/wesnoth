@@ -2015,14 +2015,21 @@ bool display::zoom_at_min()
 	return zoom_ == MinZoom;
 }
 
-bool display::set_zoom(bool increase)
+bool display::change_zoom(int by_levels)
 {
 	// Ensure we don't try to access nonexistent vector indices.
-	zoom_index_ = utils::clamp(increase ? zoom_index_ + 1 : zoom_index_ - 1, 0, final_zoom_index);
+	zoom_index_ = utils::clamp(zoom_index_ + by_levels, 0, final_zoom_index);
 
 	// No validation check is needed in the next step since we've already set the index here and
 	// know the new zoom value is indeed valid.
 	return set_zoom(zoom_levels[zoom_index_], false);
+}
+
+bool display::set_zoom(bool increase)
+{
+	// Ensure we don't try to access nonexistent vector indices.
+	zoom_index_ = utils::clamp(increase ? zoom_index_ + 1 : zoom_index_ - 1, 0, final_zoom_index);
+	return change_zoom(increase ? 1 : -1);
 }
 
 bool display::set_zoom(unsigned int amount, const bool validate_value_and_set_index)

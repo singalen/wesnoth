@@ -508,6 +508,8 @@ public:
 	/** Sets the display zoom to the specified amount. */
 	bool set_zoom(unsigned int amount, const bool validate_value_and_set_index = true);
 
+	bool change_zoom(int by_levels);
+
 	static bool zoom_at_max();
 	static bool zoom_at_min();
 

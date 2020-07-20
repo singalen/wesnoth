@@ -28,6 +28,10 @@
 #include "show_dialog.hpp" //gui::in_dialog
 #include "soundsource.hpp"
 #include "gui/core/timer.hpp"
+#include "sdl/touch_device.hpp"
+
+#include <cmath>
+#include <boost/math/special_functions/sign.hpp>
 
 static lg::log_domain log_display("display");
 #define ERR_DP LOG_STREAM(err, log_display)
@@ -218,7 +222,28 @@ void controller_base::handle_event(const SDL_Event& event)
 		break;
 
 	case SDL_FINGERUP:
-		// handled by mouse case
+	case SDL_MULTIGESTURE:
+		// TODO: I could introduce a higher-level even filter for SDL that generates: long-touch, double-tap,
+		// two-finger tap, pinch, two-finger swipe and other similar gesture events.
+		// This logic belongs there.
+		// Don't start long-press menu on multi-touch gestures.
+		if(event.type == SDL_MULTIGESTURE && event.mgesture.numFingers > 1) {
+			if(long_touch_timer_ != 0) {
+				gui2::remove_timer(long_touch_timer_);
+				long_touch_timer_ = 0;
+			}
+		}
+
+		{
+			const auto touch_device = get_display().video().get_touch_device(
+				event.type == SDL_MULTIGESTURE ? event.mgesture.touchId : event.tfinger.touchId);
+			bool do_zoom = pinch_controller_.touch_event(touch_device, event, SDL_GetTicks());
+
+			if(do_zoom) {
+				get_display().change_zoom(pinch_controller_.execute_zoom());
+			}
+		}
+
 		break;
 
 	case SDL_MOUSEWHEEL:
@@ -233,8 +258,6 @@ void controller_base::handle_event(const SDL_Event& event)
 		gui2::execute_timer(reinterpret_cast<size_t>(event.user.data1));
 		break;
 
-	// TODO: Support finger specifically, like pan the map. For now, SDL's "shadow mouse" events will do.
-	case SDL_MULTIGESTURE:
 	default:
 		break;
 	}
@@ -504,4 +527,62 @@ const config& controller_base::get_theme(const config& game_config, std::string 
 
 	static config empty;
 	return empty;
+}
+
+const float pinch_sensitivity_inches = 0.8;
+// TODO: Make it lower on a faster devices?
+const Uint32 pinch_sensitivity_time = 500;
+
+bool controller_base::sdl_pinch_controller::touch_event(const sdl::touch_device& touch_device, const SDL_Event& event, Uint32 timestamp)
+{
+	bool do_zoom = false;
+
+	switch (event.type) {
+	case SDL_FINGERUP:
+		std::cout << "SDL_FINGERUP\n";
+		if(SDL_GetNumTouchFingers(event.tfinger.touchId) < 2) {
+			pending_zoom_delta_ = std::round(pinch_cumulative_dist_ / pinch_sensitivity_inches);
+			pinch_cumulative_dist_ = 0;
+		}
+		do_zoom = pending_zoom_delta_ != 0;
+		break;
+
+	case SDL_MULTIGESTURE:
+		if(event.mgesture.numFingers >= 2) {
+			pinch_cumulative_dist_ += event.mgesture.dDist * touch_device.get_diagonal_inches();
+
+			Uint32 dt = timestamp - last_zoom_timestamp_;
+			do_zoom = dt > pinch_sensitivity_time && fabs(pinch_cumulative_dist_) > pinch_sensitivity_inches;
+
+			std::cout << "SDL_MULTIGESTURE, dt=" << dt << ", pinch_cumulative_dist_=" << pinch_cumulative_dist_ << "\n";
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	if(do_zoom) {
+		std::cout << "triggered\n";
+		last_zoom_timestamp_ = timestamp;
+	}
+	
+	return do_zoom;
+}
+
+int controller_base::sdl_pinch_controller::execute_zoom()
+{
+	if(pending_zoom_delta_ != 0) {
+		int zoom_delta = pending_zoom_delta_;
+		pending_zoom_delta_ = 0;
+		return zoom_delta;
+	}
+
+	if(fabs(pinch_cumulative_dist_) < pinch_sensitivity_inches) {
+		return 0;
+	}
+
+	int delta_level = std::round(pinch_cumulative_dist_ / pinch_sensitivity_inches);
+	pinch_cumulative_dist_ -= pinch_sensitivity_inches * boost::math::sign(pinch_cumulative_dist_);
+	return delta_level;
 }

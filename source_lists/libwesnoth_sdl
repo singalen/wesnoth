@@ -1,6 +1,7 @@
 sdl/exception.cpp
 sdl/rect.cpp
 sdl/surface.cpp
+sdl/touch_device.cpp
 sdl/utils.cpp
 sdl/window.cpp
 tracer.cpp
