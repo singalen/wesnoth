@@ -26,6 +26,7 @@ struct point;
 namespace sdl
 {
 class window;
+class touch_device;
 }
 
 class CVideo
@@ -214,6 +215,8 @@ public:
 	void clear_all_help_strings();
 
 	/***** ***** ***** ***** General utils ***** ***** ****** *****/
+
+	const sdl::touch_device& get_touch_device(SDL_TouchID id) const;
 
 	/** Waits a given number of milliseconds before returning. */
 	static void delay(unsigned int milliseconds);

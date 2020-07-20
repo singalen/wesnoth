@@ -218,4 +218,26 @@ private:
 
 	/** Context menu timer */
 	size_t long_touch_timer_;
+
+	/// It's time to zoom when:
+	// * zoom change is enough;
+	// * AND more than 0.5s has passed since the beginning of pinch, OR the fingers were lifted.
+	class sdl_pinch_controller
+	{
+	private:
+		float pinch_cumulative_dist_;
+		Uint32 last_zoom_timestamp_;
+		int pending_zoom_delta_;
+
+	public:
+		/// @return true if it's time to zoom.
+		bool touch_event(const sdl::touch_device& touch_device, const SDL_Event& event, Uint32 timestamp);
+		
+		/// Flushes the zoom state and returns the zoom level delta to apply.
+		int execute_zoom();
+	};
+
+	sdl_pinch_controller pinch_controller_;
+	
 };
+	
