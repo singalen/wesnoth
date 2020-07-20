@@ -613,6 +613,7 @@ void addon_manager::apply_filters(window& window)
 		& get_type_filter_visibility(window)
 		& get_name_filter_visibility(window);
 	find_widget<addon_list>(&window, "addons", false).set_addon_shown(res);
+	window.invalidate_layout();
 }
 
 void addon_manager::order_addons(window& window)
