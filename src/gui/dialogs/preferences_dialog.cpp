@@ -149,14 +149,20 @@ void preferences_dialog::on_filtertext_changed(text_box_base* textbox)
 // Helper function to refresh resolution list
 void preferences_dialog::set_resolution_list(menu_button& res_list, CVideo& video)
 {
+#define IOS_TEST
 	resolutions_ = video.get_available_resolutions(true);
-#define IPHONE_TEST
-#ifdef IPHONE_TEST
-	resolutions_.insert(resolutions_.begin(), point(812, 375));
-	resolutions_.insert(resolutions_.begin(), point(896, 414));
-	resolutions_.insert(resolutions_.begin(), point(736, 414));
-	resolutions_.insert(resolutions_.begin(), point(667, 375));
-	resolutions_.insert(resolutions_.begin(), point(568, 320));
+#ifdef IOS_TEST
+// iPhones
+	resolutions_.emplace_back(point(568, 320));
+	resolutions_.emplace_back(point(667, 375));
+	resolutions_.emplace_back(point(736, 414));
+	resolutions_.emplace_back(point(896, 414));
+	resolutions_.emplace_back(point(812, 375));
+
+// iPads
+	resolutions_.emplace_back(point(1112, 834));
+	resolutions_.emplace_back(point(1024, 768));
+	resolutions_.emplace_back(point(1366, 1024));
 #endif
 	std::vector<config> options;
 	for(const point& res : resolutions_) {
