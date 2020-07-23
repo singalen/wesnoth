@@ -227,9 +227,11 @@ private:
 	private:
 		float pinch_cumulative_dist_;
 		Uint32 last_zoom_timestamp_;
-		int pending_zoom_delta_;
+//		int pending_zoom_delta_;
 
 	public:
+		sdl_pinch_controller();
+		
 		/// @return true if it's time to zoom.
 		bool touch_event(const sdl::touch_device& touch_device, const SDL_Event& event, Uint32 timestamp);
 		
@@ -238,6 +240,8 @@ private:
 	};
 
 	sdl_pinch_controller pinch_controller_;
+	
+	void maybe_zoom(const SDL_Event& event);
 	
 };
 	

@@ -174,6 +174,7 @@ void controller_base::handle_event(const SDL_Event& event)
 		} else {
 			mh_base.touch_motion_event(event.tfinger, is_browsing());
 		}
+		maybe_zoom(event);
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
@@ -222,34 +223,28 @@ void controller_base::handle_event(const SDL_Event& event)
 		break;
 
 	case SDL_FINGERUP:
+		maybe_zoom(event);
+		break;
+
 	case SDL_MULTIGESTURE:
 		// TODO: I could introduce a higher-level even filter for SDL that generates: long-touch, double-tap,
 		// two-finger tap, pinch, two-finger swipe and other similar gesture events.
 		// This logic belongs there.
 		// Don't start long-press menu on multi-touch gestures.
-		if(event.type == SDL_MULTIGESTURE && event.mgesture.numFingers > 1) {
+		if(event.mgesture.numFingers > 1) {
 			if(long_touch_timer_ != 0) {
 				gui2::remove_timer(long_touch_timer_);
 				long_touch_timer_ = 0;
 			}
 		}
 
-		{
-			const auto touch_device = get_display().video().get_touch_device(
-				event.type == SDL_MULTIGESTURE ? event.mgesture.touchId : event.tfinger.touchId);
-			bool do_zoom = pinch_controller_.touch_event(touch_device, event, SDL_GetTicks());
-
-			if(do_zoom) {
-				get_display().change_zoom(pinch_controller_.execute_zoom());
-			}
-		}
-
+		maybe_zoom(event);
 		break;
 
 	case SDL_MOUSEWHEEL:
 #if defined(_WIN32) || defined(__APPLE__)
 		mh_base.mouse_wheel(-event.wheel.x, event.wheel.y, is_browsing());
-#else
+#else	
 		mh_base.mouse_wheel(event.wheel.x, event.wheel.y, is_browsing());
 #endif
 		break;
@@ -529,9 +524,28 @@ const config& controller_base::get_theme(const config& game_config, std::string 
 	return empty;
 }
 
+void controller_base::maybe_zoom(const SDL_Event& event)
+{
+	// TODO: Check event type is tfinger.
+	SDL_TouchID touch_id = event.type == SDL_MULTIGESTURE 
+		? event.mgesture.touchId 
+		: event.tfinger.touchId;
+	const auto touch_device = get_display().video().get_touch_device(touch_id);
+	bool do_zoom = pinch_controller_.touch_event(touch_device, event, SDL_GetTicks());
+
+	if(do_zoom) {
+		get_display().change_zoom(pinch_controller_.execute_zoom());
+	}
+}
+
 const float pinch_sensitivity_inches = 0.8;
 // TODO: Make it lower on a faster devices?
 const Uint32 pinch_sensitivity_time = 500;
+
+controller_base::sdl_pinch_controller::sdl_pinch_controller() 
+ : pinch_cumulative_dist_(0), last_zoom_timestamp_(0)//, pending_zoom_delta_(0)
+{
+}
 
 bool controller_base::sdl_pinch_controller::touch_event(const sdl::touch_device& touch_device, const SDL_Event& event, Uint32 timestamp)
 {
@@ -539,22 +553,14 @@ bool controller_base::sdl_pinch_controller::touch_event(const sdl::touch_device&
 
 	switch (event.type) {
 	case SDL_FINGERUP:
-		std::cout << "SDL_FINGERUP\n";
 		if(SDL_GetNumTouchFingers(event.tfinger.touchId) < 2) {
-			pending_zoom_delta_ = std::round(pinch_cumulative_dist_ / pinch_sensitivity_inches);
 			pinch_cumulative_dist_ = 0;
 		}
-		do_zoom = pending_zoom_delta_ != 0;
 		break;
 
 	case SDL_MULTIGESTURE:
 		if(event.mgesture.numFingers >= 2) {
 			pinch_cumulative_dist_ += event.mgesture.dDist * touch_device.get_diagonal_inches();
-
-			Uint32 dt = timestamp - last_zoom_timestamp_;
-			do_zoom = dt > pinch_sensitivity_time && fabs(pinch_cumulative_dist_) > pinch_sensitivity_inches;
-
-			std::cout << "SDL_MULTIGESTURE, dt=" << dt << ", pinch_cumulative_dist_=" << pinch_cumulative_dist_ << "\n";
 		}
 		break;
 
@@ -562,8 +568,12 @@ bool controller_base::sdl_pinch_controller::touch_event(const sdl::touch_device&
 		break;
 	}
 
+	if(!do_zoom) {
+		Uint32 dt = timestamp - last_zoom_timestamp_;
+		do_zoom = dt > pinch_sensitivity_time && fabs(pinch_cumulative_dist_) > pinch_sensitivity_inches;
+	}
+
 	if(do_zoom) {
-		std::cout << "triggered\n";
 		last_zoom_timestamp_ = timestamp;
 	}
 	
@@ -572,17 +582,11 @@ bool controller_base::sdl_pinch_controller::touch_event(const sdl::touch_device&
 
 int controller_base::sdl_pinch_controller::execute_zoom()
 {
-	if(pending_zoom_delta_ != 0) {
-		int zoom_delta = pending_zoom_delta_;
-		pending_zoom_delta_ = 0;
-		return zoom_delta;
-	}
-
 	if(fabs(pinch_cumulative_dist_) < pinch_sensitivity_inches) {
 		return 0;
 	}
 
-	int delta_level = std::round(pinch_cumulative_dist_ / pinch_sensitivity_inches);
-	pinch_cumulative_dist_ -= pinch_sensitivity_inches * boost::math::sign(pinch_cumulative_dist_);
+	int delta_level = std::lround(pinch_cumulative_dist_ / pinch_sensitivity_inches);
+	pinch_cumulative_dist_ -= pinch_sensitivity_inches * (std::signbit(pinch_cumulative_dist_) ? -1.0f : 1.0f);
 	return delta_level;
 }
