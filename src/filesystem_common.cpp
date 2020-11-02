@@ -67,7 +67,19 @@ std::string get_default_prefs_file()
 
 std::string get_save_index_file()
 {
+#ifndef __IPHONEOS__
 	return get_user_data_dir() + "/save_index";
+#else
+	char *ICloudDocumentsPath = Wesnoth_ICloud_GetDocumentsPath();
+	if(ICloudDocumentsPath) {
+		std::string s = ICloudDocumentsPath;
+		s += "/save_index";
+		std::free(ICloudDocumentsPath);
+        return s;
+	} else {
+		return get_user_data_dir() + "/save_index";
+	}
+#endif
 }
 
 static std::string user_saves_dir;
@@ -81,7 +93,7 @@ std::string get_saves_dir()
 #ifndef __IPHONEOS__
 	user_saves_dir = get_user_data_dir() + "/saves";
 #else
-	char *ICloudDocumentsPath = Wesnoth_GetICloudDocumentsPath();
+	char *ICloudDocumentsPath = Wesnoth_ICloud_GetDocumentsPath();
 	if(ICloudDocumentsPath) {
 		user_saves_dir = ICloudDocumentsPath;
 		user_saves_dir += "/saves";
