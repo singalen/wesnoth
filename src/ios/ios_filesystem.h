@@ -19,7 +19,9 @@
 extern "C" {
 #endif
 
-char *Wesnoth_GetICloudDocumentsPath();
+char *Wesnoth_ICloud_GetDocumentsPath();
+void Wesnoth_ICloud_StartSync();
+bool Wesnoth_ICloud_Delete(const char *file_name);
 
 #ifdef __cplusplus
 }

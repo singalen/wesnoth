@@ -30,6 +30,10 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
+#ifdef __IPHONEOS__
+#include "ios/ios_filesystem.h"
+#endif
+
 static lg::log_domain log_engine("engine");
 #define LOG_SAVE LOG_STREAM(info, log_engine)
 #define ERR_SAVE LOG_STREAM(err, log_engine)
@@ -330,6 +334,13 @@ void remove_old_auto_saves(const int autosavemax, const int infinite_auto_saves)
 void delete_game(const std::string& name)
 {
 	filesystem::delete_file(filesystem::get_saves_dir() + "/" + name);
+	
+#ifdef __IPHONEOS__
+	bool iDeleted = Wesnoth_ICloud_Delete(name.c_str());
+	if (!iDeleted) {
+		ERR_SAVE << "Error deleting save from iCloud: '" << name << "'" << std::endl;
+	}
+#endif
 
 	save_index_manager.remove(name);
 }

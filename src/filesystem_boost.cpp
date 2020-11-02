@@ -622,7 +622,7 @@ static void migrate_1_13_saves()
 static void migrate_icloud_saves()
 {
 #ifdef __IPHONEOS__
-	const char *icloud_path = Wesnoth_GetICloudDocumentsPath();
+	const char *icloud_path = Wesnoth_ICloud_GetDocumentsPath();
 	if(!icloud_path) {
 		return;
 	}
@@ -678,6 +678,10 @@ static void setup_user_data_dir()
 
 	migrate_1_13_saves();
 	migrate_icloud_saves();
+
+#if defined(__IPHONEOS__)
+	Wesnoth_ICloud_StartSync();
+#endif
 
 #ifdef _WIN32
 	lg::finish_log_file_setup();
